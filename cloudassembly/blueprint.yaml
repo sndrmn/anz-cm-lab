@@ -63,10 +63,6 @@ inputs:
 resources:
   playbook-Web:
     type: Cloud.Ansible
-    metadata:
-      layoutPosition:
-        - 0
-        - 2
     properties:
       host: '${resource.Web_Servers.*}'
       osType: linux
@@ -80,32 +76,8 @@ resources:
         provision:
           - /home/socialab/projectrock/projectrock.yml
       hostVariables: null
-  web_sg:
-    type: Cloud.SecurityGroup
-    metadata:
-      layoutPosition:
-        - 1
-        - 2
-    properties:
-      securityGroupType: existing
-      constraints:
-        - tag: 'sg:web_traffic'
-  mongo_sg:
-    type: Cloud.SecurityGroup
-    metadata:
-      layoutPosition:
-        - 1
-        - 3
-    properties:
-      securityGroupType: existing
-      constraints:
-        - tag: 'sg:mongo_db'
   LoadBalancer:
     type: Cloud.LoadBalancer
-    metadata:
-      layoutPosition:
-        - 2
-        - 1
     properties:
       routes:
         - port: '80'
@@ -138,12 +110,6 @@ resources:
           value: '${input.Platform}'
   Web_Servers:
     type: Cloud.Machine
-    dependsOn:
-      - web_sg
-    metadata:
-      layoutPosition:
-        - 2
-        - 2
     properties:
       image: ubuntu1604
       flavor: '${input.WebCompute}'
@@ -153,8 +119,6 @@ resources:
       networks:
         - network: '${resource.Web_Priv_Net.id}'
           assignPublicIpAddress: '${input.Platform == "platform:aws" ? "false" : "true"}'
-          securityGroups:
-            - '${resource.web_sg.id}'
       cloudConfig:
         users:
           - name: projectrock
@@ -166,12 +130,6 @@ resources:
             shell: /bin/bash
   Mongo_DB:
     type: Cloud.Machine
-    dependsOn:
-      - mongo_sg
-    metadata:
-      layoutPosition:
-        - 2
-        - 3
     properties:
       image: ubuntu1604
       flavor: '${input.DBCompute}'
@@ -180,8 +138,6 @@ resources:
       networks:
         - network: '${resource.DB_Priv_Net.id}'
           assignPublicIpAddress: false
-          securityGroups:
-            - '${resource.mongo_sg.id}'
       tags:
         - key: server
           value: mongodb
@@ -251,10 +207,6 @@ resources:
           - systemctl start mongod
   Pub_Net:
     type: Cloud.Network
-    metadata:
-      layoutPosition:
-        - 3
-        - 0
     properties:
       networkType: existing
       constraints:
@@ -262,10 +214,6 @@ resources:
         - tag: '${input.Platform}'
   Web_Priv_Net:
     type: Cloud.Network
-    metadata:
-      layoutPosition:
-        - 4
-        - 0
     properties:
       networkType: existing
       constraints:
@@ -273,10 +221,6 @@ resources:
         - tag: '${input.Platform}'
   DB_Priv_Net:
     type: Cloud.Network
-    metadata:
-      layoutPosition:
-        - 5
-        - 0
     properties:
       networkType: existing
       constraints:
