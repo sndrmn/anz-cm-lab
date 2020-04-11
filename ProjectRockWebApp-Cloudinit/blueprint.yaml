@@ -101,8 +101,6 @@ resources:
           value: '${input.Platform}'
   Web_Servers:
     type: Cloud.Machine
-    dependsOn:
-      - web_sg
     properties:
       image: ubuntu1604
       flavor: '${input.WebCompute}'
@@ -155,8 +153,6 @@ resources:
         desiredCapacity: 2
   Mongo_DB:
     type: Cloud.Machine
-    dependsOn:
-      - mongo_sg
     properties:
       image: ubuntu1604
       flavor: '${input.DBCompute}'
