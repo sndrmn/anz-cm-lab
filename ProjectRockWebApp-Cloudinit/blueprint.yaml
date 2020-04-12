@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Cloudinit
-version: 1.0
+version: 1.1
 formatVersion: 1
 inputs:
   Platform:
@@ -46,17 +46,13 @@ inputs:
     type: string
     encrypted: true
     description: superAdmin Password
-  MongoReadPassword:
-    type: string
-    encrypted: true
-    description: ReadUser Password
   SSHPublicKey:
     title: Public Key
     type: string
     default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmKkDl1xyE8FJjxDkq61V3Brdh4dtEgWnyLYuy3HxyguFz7wj7R4fheNlK4p6vYTWQk4AqlY3Fw2kzcZl2iuTmUMtFhllD236o7/aaVNw5HJKHp0B9A6LBpYDxSwPuWdotQPVoH7Vp/Ylimo1iVQOIh8t3tBClD/GatFIyw/OyrSpw6ncyw3RYkfC2ITlaCzFKGXv1weZNFK/rtyFcECvK1l4R0qLsR5CvQ/x9hFocRocMeqZ9fNV/+0Qws6f9IXKxYvBuDgMG41RFlsOsmzPNh3OQHy7VhIdeDl18aynUCopZIvM2siUAevlTrb01VOhME8Yr2CecGUI5o8aEw4R7
   Mobile:
     type: string
-    default: '+61438952148'
+    default: '+61417874316'
   SendSMS:
     type: string
     oneOf:
@@ -66,20 +62,6 @@ inputs:
         const: 'No'
     default: 'No'
 resources:
-  web_sg:
-    type: Cloud.SecurityGroup
-    properties:
-      securityGroupType: existing
-      constraints:
-        - tag: '${input.Region}'
-        - tag: 'sg:web_traffic'
-  mongo_sg:
-    type: Cloud.SecurityGroup
-    properties:
-      securityGroupType: existing
-      constraints:
-        - tag: '${input.Region}'
-        - tag: 'sg:mongo_db'
   LoadBalancer:
     type: Cloud.LoadBalancer
     properties:
@@ -114,8 +96,6 @@ resources:
           value: '${input.Platform}'
   Web_Servers:
     type: Cloud.Machine
-    dependsOn:
-      - web_sg
     properties:
       image: ubuntu1604
       flavor: '${input.WebCompute}'
@@ -124,8 +104,6 @@ resources:
       networks:
         - network: '${resource.Web_Priv_Net.id}'
           assignPublicIpAddress: false
-          securityGroups:
-            - '${resource.web_sg.id}'
       cloudConfig:
         repo_update: true
         repo_upgrade: all
@@ -147,7 +125,7 @@ resources:
         runcmd:
           - chmod 646 /etc/apache2/envvars
           - echo "export MONGOUSER=ReadUser" >> /etc/apache2/envvars
-          - 'echo "export MONGOPASS=${input.MongoReadPassword}" >> /etc/apache2/envvars'
+          - 'echo "export MONGOPASS="password" >> /etc/apache2/envvars'
           - chmod 646 /etc/apache2/envvars
           - 'add-apt-repository ppa:ondrej/php -y'
           - apt-get update
@@ -170,8 +148,6 @@ resources:
         desiredCapacity: 2
   Mongo_DB:
     type: Cloud.Machine
-    dependsOn:
-      - mongo_sg
     properties:
       image: ubuntu1604
       flavor: '${input.DBCompute}'
@@ -180,8 +156,6 @@ resources:
       networks:
         - network: '${resource.DB_Priv_Net.id}'
           assignPublicIpAddress: false
-          securityGroups:
-            - '${resource.mongo_sg.id}'
       tags:
         - key: server
           value: mongodb
@@ -217,7 +191,7 @@ resources:
               }
               var user2 = {
               "user" : "ReadUser",
-              "pwd" : '${input.MongoReadPassword}',
+              "pwd" : "password",
                roles : [
                   {
                         "role" : "read",
