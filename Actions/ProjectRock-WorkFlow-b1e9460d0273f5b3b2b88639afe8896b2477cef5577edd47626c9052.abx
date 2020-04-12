@@ -1,0 +1,9 @@
+---
+exportVersion: "1"
+exportId: "8a76930e6e7041c1016e790cb29a12b4"
+name: "ProjectRock-WorkFlow"
+description: "Workflow activates after load balancer successfully deployed.  Updates\
+  \ R53 records and uses AWS SNS to notify user of completion"
+timeoutSeconds: 600
+actionType: "FLOW"
+memoryInMB: 150

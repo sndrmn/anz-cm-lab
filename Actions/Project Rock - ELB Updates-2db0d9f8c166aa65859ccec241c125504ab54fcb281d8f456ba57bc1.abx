@@ -1,0 +1,19 @@
+---
+exportVersion: "1"
+exportId: "8a5ec23c6f9a48fe016f9cdd12e916c6"
+name: "Project Rock - ELB Updates"
+runtime: "python"
+entrypoint: "handler"
+description: "Updates ELB if Deployed in AWS"
+inputs:
+  target: "World"
+timeoutSeconds: 180
+deploymentTimeoutSeconds: 600
+actionType: "SCRIPT"
+provider: "aws"
+configuration:
+  const-providers:
+  - "aws"
+  const_aws-iam_role: "TheRock-lambdarole-sveenstra"
+  const_azure-system_managed_identity: false
+memoryInMB: 150

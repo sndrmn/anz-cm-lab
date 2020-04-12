@@ -1,0 +1,18 @@
+---
+exportVersion: "1"
+exportId: "8a7698386e94bb02016e9f9158f1280f"
+name: "Project Rock - NoNotification"
+runtime: "python"
+entrypoint: "handler"
+description: "Blank currently, just put in place to test conditional flows in workflow"
+inputs:
+  target: "World"
+timeoutSeconds: 180
+deploymentTimeoutSeconds: 600
+actionType: "SCRIPT"
+provider: "aws"
+configuration:
+  const-providers:
+  - "aws"
+  const_aws-iam_role: "TheRock-lambdarole-sveenstra"
+memoryInMB: 150
