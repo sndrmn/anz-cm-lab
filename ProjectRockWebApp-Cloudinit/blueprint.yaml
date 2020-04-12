@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Cloudinit
-version: 1.1
+version: 1.2
 formatVersion: 1
 inputs:
   Platform:
@@ -9,8 +9,7 @@ inputs:
         const: 'platform:aws'
       - title: Azure
         const: 'platform:azure'
-      - title: vSphere
-    default: 'platform:vsphere'
+    default: 'platform:aws'
   Region:
     type: string
     oneOf:
@@ -67,6 +66,20 @@ inputs:
         const: 'No'
     default: 'No'
 resources:
+  web_sg:
+    type: Cloud.SecurityGroup
+    properties:
+      securityGroupType: existing
+      constraints:
+        - tag: '${input.Region}'
+        - tag: 'sg:web_traffic'
+  mongo_sg:
+    type: Cloud.SecurityGroup
+    properties:
+      securityGroupType: existing
+      constraints:
+        - tag: '${input.Region}'
+        - tag: 'sg:mongo_db'
   LoadBalancer:
     type: Cloud.LoadBalancer
     properties:
@@ -101,6 +114,8 @@ resources:
           value: '${input.Platform}'
   Web_Servers:
     type: Cloud.Machine
+    dependsOn:
+      - web_sg
     properties:
       image: ubuntu1604
       flavor: '${input.WebCompute}'
@@ -109,6 +124,8 @@ resources:
       networks:
         - network: '${resource.Web_Priv_Net.id}'
           assignPublicIpAddress: false
+          securityGroups:
+            - '${resource.web_sg.id}'
       cloudConfig:
         repo_update: true
         repo_upgrade: all
@@ -153,6 +170,8 @@ resources:
         desiredCapacity: 2
   Mongo_DB:
     type: Cloud.Machine
+    dependsOn:
+      - mongo_sg
     properties:
       image: ubuntu1604
       flavor: '${input.DBCompute}'
@@ -161,6 +180,8 @@ resources:
       networks:
         - network: '${resource.DB_Priv_Net.id}'
           assignPublicIpAddress: false
+          securityGroups:
+            - '${resource.mongo_sg.id}'
       tags:
         - key: server
           value: mongodb
