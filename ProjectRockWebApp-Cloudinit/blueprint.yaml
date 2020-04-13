@@ -125,7 +125,7 @@ resources:
         runcmd:
           - chmod 646 /etc/apache2/envvars
           - echo "export MONGOUSER=ReadUser" >> /etc/apache2/envvars
-          - 'echo "export MONGOPASS="password" >> /etc/apache2/envvars'
+          - 'echo "export MONGOPASS=password" >> /etc/apache2/envvars'
           - chmod 646 /etc/apache2/envvars
           - 'add-apt-repository ppa:ondrej/php -y'
           - apt-get update
