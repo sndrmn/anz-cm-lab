@@ -1,4 +1,4 @@
-name: TheRock WebApp w/Cloudinit
+name: TheRock WebApp w/CloudInit
 version: 1.2
 formatVersion: 1
 inputs:
