@@ -1,5 +1,5 @@
 name: TheRock WebApp Frontend
-version: 1.0
+version: 1.1
 formatVersion: 1
 inputs:
   WebCompute:
@@ -18,16 +18,6 @@ inputs:
     type: string
     default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmKkDl1xyE8FJjxDkq61V3Brdh4dtEgWnyLYuy3HxyguFz7wj7R4fheNlK4p6vYTWQk4AqlY3Fw2kzcZl2iuTmUMtFhllD236o7/aaVNw5HJKHp0B9A6LBpYDxSwPuWdotQPVoH7Vp/Ylimo1iVQOIh8t3tBClD/GatFIyw/OyrSpw6ncyw3RYkfC2ITlaCzFKGXv1weZNFK/rtyFcECvK1l4R0qLsR5CvQ/x9hFocRocMeqZ9fNV/+0Qws6f9IXKxYvBuDgMG41RFlsOsmzPNh3OQHy7VhIdeDl18aynUCopZIvM2siUAevlTrb01VOhME8Yr2CecGUI5o8aEw4R7
 resources:
-  web_sg:
-    type: Cloud.SecurityGroup
-    metadata:
-      layoutPosition:
-        - 0
-        - 1
-    properties:
-      securityGroupType: existing
-      constraints:
-        - tag: 'sg:web_traffic'
   LoadBalancer:
     type: Cloud.LoadBalancer
     metadata:
@@ -56,8 +46,6 @@ resources:
       name: LoadBalancer-projectrocktest
   Web_Servers:
     type: Cloud.Machine
-    dependsOn:
-      - web_sg
     metadata:
       layoutPosition:
         - 1
@@ -70,8 +58,6 @@ resources:
       networks:
         - network: '${resource.Web_Priv_Net.id}'
           assignPublicIpAddress: true
-          securityGroups:
-            - '${resource.web_sg.id}'
       cloudConfig:
         repo_update: true
         repo_upgrade: all
