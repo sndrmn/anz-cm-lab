@@ -12,8 +12,5 @@ deploymentTimeoutSeconds: 600
 actionType: "SCRIPT"
 provider: "aws"
 configuration:
-  const-providers:
-  - "aws"
   const_aws-iam_role: "TheRock-lambdarole-sveenstra"
-  const_azure-system_managed_identity: false
 memoryInMB: 150
