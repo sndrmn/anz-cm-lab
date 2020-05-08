@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 1.0
+version: 1.1
 formatVersion: 1
 inputs:
   Platform:
@@ -9,6 +9,8 @@ inputs:
         const: 'platform:aws'
       - title: Azure
         const: 'platform:azure'
+      - title: vSphere
+        const: 'platform:vsphere'
     default: 'platform:aws'
   Region:
     type: string
@@ -66,16 +68,17 @@ resources:
     properties:
       host: '${resource.Web_Servers.*}'
       osType: linux
-      account: SociaLab Ansible OSS
+      account: '${input.Platform == "platform:vsphere" ? "CMLab-Ansible" : "SociaLab Ansible OSS"}'
       count: 2
       username: projectrock
-      privateKeyFile: /home/socialab/projectrock/projectrock-ansible.pem
+      privateKeyFile: '${input.Platform == "platform:vsphere" ? "/home/ubuntu/projectrock/projectrock-ansible.pem" : "/home/socialab/projectrock/projectrock-ansible.pem"}'
       groups:
-        - projectrock-web
+        - projectrock_web
       playbooks:
         provision:
-          - /home/socialab/projectrock/projectrock.yml
+          - '${input.Platform == "platform:vsphere" ? "/home/ubuntu/projectrock/projectrock.yml" : "/home/socialab/projectrock/projectrock.yml"}'
       hostVariables: null
+      inventoryFile: '${input.Platform == "platform:vsphere" ? "/home/ubuntu/projectrock/hosts" : "/home/socialab/projectrock/hosts"}'
   LoadBalancer:
     type: Cloud.LoadBalancer
     properties:
@@ -118,7 +121,8 @@ resources:
         - tag: '${input.Region}'
       networks:
         - network: '${resource.Web_Priv_Net.id}'
-          assignPublicIpAddress: '${input.Platform == "platform:aws" ? "false" : "true"}'
+          assignPublicIpAddress: '${input.Platform == "platform:azure" ? "true" : "false"}'
+          assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       cloudConfig:
         users:
           - name: projectrock
@@ -138,6 +142,7 @@ resources:
       networks:
         - network: '${resource.DB_Priv_Net.id}'
           assignPublicIpAddress: false
+          assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       tags:
         - key: server
           value: mongodb
@@ -210,19 +215,19 @@ resources:
     properties:
       networkType: existing
       constraints:
-        - tag: 'function:public'
+        - tag: '${input.Platform == "platform:vsphere" ? "function:test" : "function:public"}'
         - tag: '${input.Platform}'
   Web_Priv_Net:
     type: Cloud.Network
     properties:
       networkType: existing
       constraints:
-        - tag: 'function:web-priv'
+        - tag: '${input.Platform == "platform:vsphere" ? "function:test" : "function:web-priv"}'
         - tag: '${input.Platform}'
   DB_Priv_Net:
     type: Cloud.Network
     properties:
       networkType: existing
       constraints:
-        - tag: 'function:database'
+        - tag: '${input.Platform == "platform:vsphere" ? "function:test" : "function:database"}'
         - tag: '${input.Platform}'
