@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 1.1
+version: 1.2
 formatVersion: 1
 inputs:
   Platform:
@@ -12,14 +12,6 @@ inputs:
       - title: vSphere
         const: 'platform:vsphere'
     default: 'platform:aws'
-  Region:
-    type: string
-    oneOf:
-      - title: Sydney
-        const: 'region:sydney'
-      - title: Singapore
-        const: 'region:singapore'
-    default: 'region:sydney'
   WebCompute:
     type: string
     oneOf:
@@ -96,7 +88,7 @@ resources:
             healthyThreshold: 2
             unhealthyThreshold: 5
       constraints:
-        - tag: '${input.Region}'
+        - tag: 'region:sydney'
       network: '${resource.Pub_Net.id}'
       instances:
         - '${resource.Web_Servers.id}'
@@ -108,7 +100,7 @@ resources:
         - key: SendSMS
           value: '${input.SendSMS}'
         - key: Region
-          value: '${input.Region}'
+          value: 'region:sydney'
         - key: Platform
           value: '${input.Platform}'
   Web_Servers:
@@ -118,7 +110,7 @@ resources:
       flavor: '${input.WebCompute}'
       count: 2
       constraints:
-        - tag: '${input.Region}'
+        - tag: 'region:sydney'
       networks:
         - network: '${resource.Web_Priv_Net.id}'
           assignPublicIpAddress: '${input.Platform == "platform:azure" ? "true" : "false"}'
@@ -138,7 +130,7 @@ resources:
       image: ubuntu1604
       flavor: '${input.DBCompute}'
       constraints:
-        - tag: '${input.Region}'
+        - tag: '$region:sydney'
       networks:
         - network: '${resource.DB_Priv_Net.id}'
           assignPublicIpAddress: false
