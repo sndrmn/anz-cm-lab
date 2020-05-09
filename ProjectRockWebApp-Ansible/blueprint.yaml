@@ -130,7 +130,7 @@ resources:
       image: ubuntu1604
       flavor: '${input.DBCompute}'
       constraints:
-        - tag: '$region:sydney'
+        - tag: 'region:sydney'
       networks:
         - network: '${resource.DB_Priv_Net.id}'
           assignPublicIpAddress: false
