@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 1.3
+version: 1.4
 formatVersion: 1
 inputs:
   Platform:
@@ -70,7 +70,7 @@ resources:
         provision:
           - '${input.Platform == "platform:vsphere" ? "/home/ubuntu/projectrock/projectrock.yml" : "/home/socialab/projectrock/projectrock.yml"}'
       hostVariables: null
-      inventoryFile: '${input.Platform == "platform:vsphere" ? "/home/ubuntu/projectrock/hosts" : "/home/socialab/projectrock/hosts"}'
+      inventoryFile: '${input.Platform == "platform:vsphere" ? "/home/ubuntu/projectrock/hosts" : "/home/socialab/hosts"}'
   LoadBalancer:
     type: Cloud.LoadBalancer
     properties:
