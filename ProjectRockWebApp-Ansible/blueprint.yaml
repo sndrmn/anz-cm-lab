@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 1.4
+version: 1.5
 formatVersion: 1
 inputs:
   Platform:
@@ -55,22 +55,54 @@ inputs:
         const: 'No'
     default: 'No'
 resources:
-  playbook-Web:
+  Ansible-vSphere:
     type: Cloud.Ansible
     properties:
       host: '${resource.Web_Servers.*}'
       osType: linux
-      account: '${input.Platform == "platform:vsphere" ? "CMLab-Ansible" : "SociaLab Ansible OSS"}'
-      count: 2
+      account: CMLab-Ansible
+      count: '${input.Platform == "platform:vsphere" ? 2 : 0}'
       username: projectrock
-      privateKeyFile: '${input.Platform == "platform:vsphere" ? "/home/ubuntu/projectrock/projectrock-ansible.pem" : "/home/socialab/projectrock/projectrock-ansible.pem"}'
+      privateKeyFile: /home/ubuntu/projectrock/projectrock-ansible.pem
       groups:
         - projectrock_web
       playbooks:
         provision:
-          - '${input.Platform == "platform:vsphere" ? "/home/ubuntu/projectrock/projectrock.yml" : "/home/socialab/projectrock/projectrock.yml"}'
+          - /home/ubuntu/projectrock/projectrock.yml
       hostVariables: null
-      inventoryFile: '${input.Platform == "platform:vsphere" ? "/home/ubuntu/projectrock/hosts" : "/home/socialab/hosts"}'
+      inventoryFile: /home/ubuntu/hosts
+  Ansible-Azure:
+    type: Cloud.Ansible
+    properties:
+      host: '${resource.Web_Servers.*}'
+      osType: linux
+      account: Azure-Ansible
+      count: '${input.Platform == "platform:azure" ? 2 : 0}'
+      username: projectrock
+      privateKeyFile: /home/ubuntu/projectrock/projectrock-ansible.pem
+      groups:
+        - projectrock_web
+      playbooks:
+        provision:
+          - /home/ubuntu/projectrock/projectrock.yml
+      hostVariables: null
+      inventoryFile: /home/ubuntu/hosts
+  Ansible-AWS:
+    type: Cloud.Ansible
+    properties:
+      host: '${resource.Web_Servers.*}'
+      osType: linux
+      account: SociaLab Ansible OSS
+      count: '${input.Platform == "platform:aws" ? 2 : 0}'
+      username: projectrock
+      privateKeyFile: /home/socialab/projectrock/projectrock-ansible.pem
+      groups:
+        - projectrock_web
+      playbooks:
+        provision:
+          - /home/socialab/projectrock/projectrock.yml
+      hostVariables: null
+      inventoryFile: /home/socialab/hosts
   LoadBalancer:
     type: Cloud.LoadBalancer
     properties:
@@ -113,7 +145,7 @@ resources:
         - tag: 'region:sydney'
       networks:
         - network: '${resource.Web_Priv_Net.id}'
-          assignPublicIpAddress: '${input.Platform == "platform:azure" ? "true" : "false"}'
+          assignPublicIpAddress: false
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       cloudConfig:
         users:
