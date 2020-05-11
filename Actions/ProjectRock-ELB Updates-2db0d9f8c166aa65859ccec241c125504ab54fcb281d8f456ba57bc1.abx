@@ -1,0 +1,17 @@
+---
+exportVersion: "1"
+exportId: "8a5ec23c6f9a48fe016f9cdd12e916c6"
+name: "ProjectRock-ELB Updates"
+runtime: "python"
+entrypoint: "handler"
+description: "ABX enables SSL on the Load Balancer if the blue print is deployed to\
+  \ AWS"
+inputs:
+  target: "World"
+timeoutSeconds: 180
+deploymentTimeoutSeconds: 600
+actionType: "SCRIPT"
+provider: "aws"
+configuration:
+  const_aws-iam_role: "TheRock-lambdarole-sveenstra"
+memoryInMB: 150

@@ -1,0 +1,15 @@
+---
+exportVersion: "1"
+exportId: "8a76930e6e7041c1016e78e0a6811266"
+name: "ProjectRock-SNSNotification"
+runtime: "python"
+entrypoint: "handler"
+description: "ABX utilises AWS SNS service to send SMS to Mobile Number entered in\
+  \ blue print."
+timeoutSeconds: 300
+deploymentTimeoutSeconds: 600
+actionType: "SCRIPT"
+provider: "aws"
+configuration:
+  const_aws-iam_role: "TheRock-lambdarole-sveenstra"
+memoryInMB: 150

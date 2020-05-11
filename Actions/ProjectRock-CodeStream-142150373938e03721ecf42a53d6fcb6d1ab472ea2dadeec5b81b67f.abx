@@ -1,0 +1,17 @@
+---
+exportVersion: "1"
+exportId: "8a5e04757050b89f01705150e2a3042e"
+name: "ProjectRock-CodeStream"
+runtime: "python"
+entrypoint: "handler"
+description: "ABX updates Route 53 \nrecord (projectrocktest.vmware.education) for\
+  \ the Codestream test environment."
+inputs:
+  target: "World"
+timeoutSeconds: 180
+deploymentTimeoutSeconds: 600
+actionType: "SCRIPT"
+provider: "aws"
+configuration:
+  const_aws-iam_role: "TheRock-lambdarole-sveenstra"
+memoryInMB: 150
