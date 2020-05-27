@@ -1,0 +1,148 @@
+name: TheRock Managed MSSQL
+version: 1.0
+formatVersion: 1
+inputs:
+  Platform:
+    type: string
+    oneOf:
+      - title: AWS
+        const: 'platform:aws'
+      - title: Azure
+        const: 'platform:azure'
+    default: 'platform:aws'
+  SQLServerName:
+    type: string
+    default: projectrock-db
+    title: DB Server Name
+  SQLInstanceName:
+    type: string
+    default: prod-db
+    title: DB Instance Name
+  SQLAdminAccount:
+    type: string
+    default: projectrock
+    title: DB Admin Account
+  SQLAdminPassword:
+    type: string
+    encrypted: true
+    title: DB Admin Password
+resources:
+  AZURE-DB-INSTANCE:
+    type: Cloud.Service.Azure.SQL.Database
+    dependsOn:
+      - AZURE-MSSQL
+    metadata:
+      layoutPosition:
+        - 0
+        - 2
+    properties:
+      name: '${input.SQLInstanceName}'
+      region: australiaeast
+      account: SDDC ANZ Azure
+      server_name: '${input.SQLServerName}'
+      resource_group_name: rg-vmwapj-anz
+      count: '${input.Platform == "platform:azure" ? 1 : 0}'
+  Web-Server:
+    type: Cloud.Machine
+    metadata:
+      layoutPosition:
+        - 1
+        - 0
+    properties:
+      image: ubuntu1604
+      flavor: small
+      networks:
+        - network: '${resource["Public-Network"].id}'
+          assignPublicIpAddress: true
+      cloudConfig:
+        repo_update: true
+        repo_upgrade: all
+        package_update: true
+        package_upgrade: all
+        packages:
+          - apache2
+          - libapache2-mod-php7.4
+          - git-core
+        users:
+          - name: projectrock
+            ssh-authorized-keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmKkDl1xyE8FJjxDkq61V3Brdh4dtEgWnyLYuy3HxyguFz7wj7R4fheNlK4p6vYTWQk4AqlY3Fw2kzcZl2iuTmUMtFhllD236o7/aaVNw5HJKHp0B9A6LBpYDxSwPuWdotQPVoH7Vp/Ylimo1iVQOIh8t3tBClD/GatFIyw/OyrSpw6ncyw3RYkfC2ITlaCzFKGXv1weZNFK/rtyFcECvK1l4R0qLsR5CvQ/x9hFocRocMeqZ9fNV/+0Qws6f9IXKxYvBuDgMG41RFlsOsmzPNh3OQHy7VhIdeDl18aynUCopZIvM2siUAevlTrb01VOhME8Yr2CecGUI5o8aEw4R7
+            sudo:
+              - 'ALL=(ALL) NOPASSWD:ALL'
+            groups: sudo
+            shell: /bin/bash
+        runcmd:
+          - 'add-apt-repository ppa:ondrej/php -y'
+          - 'curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -'
+          - 'curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list'
+          - apt-get update
+          - ACCEPT_EULA=Y apt-get -y install msodbcsql17
+          - apt-get install libapache2-mod-php7.4 php7.4 unixodbc-dev php-dev php-xml php-pear -y --allow-unauthenticated
+          - pecl install sqlsrv
+          - pecl install pdo_sqlsrv
+          - a2dismod php7.0
+          - a2dismod mpm_event
+          - a2enmod mpm_prefork
+          - a2enmod php7.4
+          - echo "extension=sqlsrv.so" >> /etc/php/7.4/apache2/php.ini
+          - echo "extension=pdo_sqlsrv.so" >> /etc/php/7.4/apache2/php.ini
+          - printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/7.4/mods-available/sqlsrv.ini
+          - printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/7.4/mods-available/pdo_sqlsrv.ini
+          - phpenmod -v 7.4 sqlsrv pdo_sqlsrv
+          - cd /var/www/html
+          - rm index.html
+          - 'git clone https://github.com/sndrmn/ProjectRockMSSQL.git .'
+          - systemctl restart apache2
+  AWS-RDS-MSSQL:
+    type: Cloud.Service.AWS.DB.Instance
+    metadata:
+      layoutPosition:
+        - 1
+        - 1
+    properties:
+      region: ap-southeast-2
+      account: SDDC ANZ AWS
+      instance_class: db.t2.medium
+      identifier: '${input.SQLServerName}'
+      name: '${input.SQLInstanceName}'
+      port: 1433
+      engine: sqlserver-se
+      multi_az: false
+      password: '${input.SQLAdminPassword}'
+      username: '${input.SQLAdminAccount}'
+      storage_type: gp2
+      engine_version: 14.00.3281.6.v1
+      allocated_storage: 100
+      availability_zone: ap-southeast-2b
+      db_subnet_group_name: projectrock-db-subnet
+      vpc_security_group_ids:
+        - sg-09b03d1ee81452010
+      skip_final_snapshot: true
+      count: '${input.Platform == "platform:aws" ? 1 : 0}'
+  AZURE-MSSQL:
+    type: Cloud.Service.Azure.SQL.Server
+    metadata:
+      layoutPosition:
+        - 1
+        - 2
+    properties:
+      name: '${input.SQLServerName}'
+      region: australiaeast
+      account: SDDC ANZ Azure
+      version: '12.0'
+      administrator_login: '${input.SQLAdminAccount}'
+      resource_group_name: rg-vmwapj-anz
+      administrator_login_password: '${input.SQLAdminPassword}'
+      count: '${input.Platform == "platform:azure" ? 1 : 0}'
+  Public-Network:
+    type: Cloud.Network
+    metadata:
+      layoutPosition:
+        - 2
+        - 0
+    properties:
+      networkType: existing
+      constraints:
+        - tag: 'function:public'
+        - tag: '${input.Platform}'
+
