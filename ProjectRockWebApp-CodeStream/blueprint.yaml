@@ -1,5 +1,5 @@
 name: TheRock WebApp CodeStream
-version: 1.1
+version: 1.2
 formatVersion: 1
 inputs:
   Platform:
@@ -128,11 +128,6 @@ resources:
           - rm index.html
           - 'git clone https://github.com/sndrmn/ProjectRock.git .'
           - service apache2 restart
-          - cd /home/projectrock
-          - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/ssl.sh"'
-          - chmod +x ssl.sh
-          - bash /home/projectrock/ssl.sh
-          - rm /home/projectrock/ssl.sh
   Mongo_DB:
     type: Cloud.Machine
     properties:
