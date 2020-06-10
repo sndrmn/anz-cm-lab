@@ -1,5 +1,5 @@
 name: TheRock WebApp CodeStream
-version: 1.2
+version: 1.3
 formatVersion: 1
 inputs:
   Platform:
@@ -13,18 +13,6 @@ inputs:
         const: 'platform:vsphere'
     default: 'platform:aws'
   WebCompute:
-    type: string
-    oneOf:
-      - title: Tiny
-        const: tiny
-      - title: Small
-        const: small
-      - title: Medium
-        const: medium
-      - title: Large
-        const: large
-    default: tiny
-  DBCompute:
     type: string
     oneOf:
       - title: Tiny
@@ -128,84 +116,6 @@ resources:
           - rm index.html
           - 'git clone https://github.com/sndrmn/ProjectRock.git .'
           - service apache2 restart
-  Mongo_DB:
-    type: Cloud.Machine
-    properties:
-      image: ubuntu1604
-      flavor: '${input.DBCompute}'
-      constraints:
-        - tag: 'region:sydney'
-      networks:
-        - network: '${resource.DB_Priv_Net.id}'
-          assignPublicIpAddress: false
-          assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
-      tags:
-        - key: server
-          value: mongodb
-      cloudConfig:
-        repo_update: true
-        repo_upgrade: all
-        package_update: true
-        package_upgrade: all
-        users:
-          - name: projectrock
-            ssh-authorized-keys:
-              - '${input.SSHPublicKey}'
-            sudo:
-              - 'ALL=(ALL) NOPASSWD:ALL'
-            groups: sudo
-            shell: /bin/bash
-        write_files:
-          - path: /home/projectrock/mongousers.sh
-            content: |
-              #!/bin/bash
-              echo "Adding admin user"
-              mongo admin <<'EOF'
-              use admin
-              var user = {
-              "user" : "superAdmin",
-              "pwd" : 'C0Dm4l@m0blE',
-               roles : [
-                   {
-                        "role" : "userAdminAnyDatabase",
-                        "db" : "admin"
-                   }
-               ]
-              }
-              var user2 = {
-              "user" : "ReadUser",
-              "pwd" : "password",
-               roles : [
-                  {
-                        "role" : "read",
-                        "db" : "RockMovies"
-                 }
-               ]
-              }
-              db.createUser(user);
-              use RockMovies
-              db.createUser(user2);
-              exit
-              EOF
-        runcmd:
-          - cd /var/tmp
-          - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/MovieList.json"'
-          - 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 4B7C549A058F8B6B'
-          - 'echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb.list'
-          - apt-get update
-          - apt install mongodb-org -y
-          - systemctl enable mongod
-          - systemctl start mongod
-          - mongoimport --db RockMovies --collection movies --file MovieList.json
-          - cd /home/projectrock
-          - chmod +x mongousers.sh
-          - ./mongousers.sh
-          - rm mongousers.sh
-          - systemctl stop mongod
-          - cd /etc
-          - rm mongod.conf
-          - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/mongod.conf"'
-          - systemctl start mongod
   Pub_Net:
     type: Cloud.Network
     properties:
