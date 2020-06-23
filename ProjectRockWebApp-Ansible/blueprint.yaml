@@ -125,7 +125,7 @@ resources:
       instances:
         - '${resource.Web_Servers.id}'
       internetFacing: true
-      name: LoadBalancer-projectrock
+      name: '${env.deploymentName}'
       tags:
         - key: Number
           value: '${input.Mobile}'
