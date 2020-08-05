@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 1.7
+version: 1.8
 formatVersion: 1
 inputs:
   Platform:
@@ -36,6 +36,10 @@ inputs:
       - title: Large
         const: large
     default: medium
+  URL:
+    type: string
+    description: Custom URL to access site.  Uses vmware.education domain
+    default: .vmware.education
   MongoAdminPassword:
     type: string
     encrypted: true
@@ -119,6 +123,8 @@ resources:
             intervalSeconds: 5
             healthyThreshold: 2
             unhealthyThreshold: 5
+      customURL: 
+        - '${input.URL}'
       constraints:
         - tag: 'region:sydney'
       network: '${resource.Pub_Net.id}'
