@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 1.9
+version: 2.0
 formatVersion: 1
 inputs:
   Platform:
@@ -35,11 +35,7 @@ inputs:
         const: medium
       - title: Large
         const: large
-    default: medium
-  URL:
-    type: string
-    description: Custom URL to access site.  Uses vmware.education domain
-    default: .vmware.education
+    default: medium]
   MongoAdminPassword:
     type: string
     encrypted: true
@@ -110,7 +106,7 @@ resources:
   LoadBalancer:
     type: Cloud.LoadBalancer
     properties:
-      customURL: '${input.URL}'
+      customURL: '${env.deploymentName}'
       Number: '${input.Mobile}'
       SendSMS: '${input.SendSMS}'
       Region: 'region:sydney'
@@ -160,6 +156,7 @@ resources:
   Mongo_DB:
     type: Cloud.Machine
     properties:
+      mongodb: 'true'
       image: ubuntu1604
       flavor: '${input.DBCompute}'
       constraints:
@@ -168,9 +165,6 @@ resources:
         - network: '${resource.DB_Priv_Net.id}'
           assignPublicIpAddress: false
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
-      tags:
-        - key: server
-          value: mongodb
       cloudConfig:
         repo_update: true
         repo_upgrade: all
