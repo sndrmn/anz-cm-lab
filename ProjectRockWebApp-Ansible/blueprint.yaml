@@ -109,6 +109,8 @@ resources:
       inventoryFile: /home/socialab/hosts
   LoadBalancer:
     type: Cloud.LoadBalancer
+    customURL: 
+      - '${input.URL}'
     properties:
       routes:
         - port: '80'
@@ -123,8 +125,6 @@ resources:
             intervalSeconds: 5
             healthyThreshold: 2
             unhealthyThreshold: 5
-      customURL: 
-        - '${input.URL}'
       constraints:
         - tag: 'region:sydney'
       network: '${resource.Pub_Net.id}'
