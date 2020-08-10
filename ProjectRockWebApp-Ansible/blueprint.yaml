@@ -35,7 +35,7 @@ inputs:
         const: medium
       - title: Large
         const: large
-    default: medium]
+    default: medium
   MongoAdminPassword:
     type: string
     encrypted: true
