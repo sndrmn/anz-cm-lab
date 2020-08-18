@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.1
+version: 2.2
 formatVersion: 1
 inputs:
   Platform:
@@ -69,7 +69,8 @@ resources:
       playbooks:
         provision:
           - /home/ubuntu/projectrock/projectrock.yml
-      hostVariables: null
+      hostVariables: |
+        website: '${env.deploymentName}'
       inventoryFile: /home/ubuntu/hosts
   Ansible-Azure:
     type: Cloud.Ansible
@@ -85,7 +86,8 @@ resources:
       playbooks:
         provision:
           - /home/ubuntu/projectrock/projectrock.yml
-      hostVariables: null
+      hostVariables: |
+        website: '${env.deploymentName}'
       inventoryFile: /home/ubuntu/hosts
   Ansible-AWS:
     type: Cloud.Ansible
@@ -101,7 +103,8 @@ resources:
       playbooks:
         provision:
           - /home/socialab/projectrock/projectrock.yml
-      hostVariables: null
+      hostVariables: |
+        website: '${env.deploymentName}'
       inventoryFile: /home/socialab/hosts
   LoadBalancer:
     type: Cloud.LoadBalancer
