@@ -1,0 +1,14 @@
+---
+exportVersion: "1"
+exportId: "8a7698786e651b8d016e678f3f7d06e4"
+name: "ProjectRock-Route53 Updates"
+runtime: "python"
+entrypoint: "handler"
+description: "ABX creates / updates Route 53 DNS record 'customUrl.vmware.education' "
+timeoutSeconds: 180
+deploymentTimeoutSeconds: 600
+actionType: "SCRIPT"
+provider: "aws"
+configuration:
+  const_aws-iam_role: "TheRock-lambdarole-sveenstra"
+memoryInMB: 150

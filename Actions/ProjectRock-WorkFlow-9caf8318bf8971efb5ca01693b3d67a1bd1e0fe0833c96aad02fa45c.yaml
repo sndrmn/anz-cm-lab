@@ -1,0 +1,31 @@
+---
+version: 1
+flow:
+  flow_start:
+    next: fork1
+  fork1:
+    fork:
+      next: [action1, action2]
+  action1:
+    action: ProjectRock-Route53 Updates
+    next: join1
+  action2:
+    action: ProjectRock-ELB Updates
+    next: join1
+  join1:
+   join:
+    type: all
+    next: condition
+  condition:
+    switch:
+     ${customProperties['SendSMS'] == 'Yes'} : action3
+     ${customProperties['SendSMS'] == 'No'} : action4
+  action3:
+   action: ProjectRock-SNSNotification
+   next: action5
+  action4:
+    action: ProjectRock-NoNotification
+    next: action5
+  action5:
+   action: ProjectRock-SSMParameter
+   next: flow_end

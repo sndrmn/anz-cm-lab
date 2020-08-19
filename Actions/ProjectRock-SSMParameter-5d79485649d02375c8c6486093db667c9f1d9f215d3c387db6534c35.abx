@@ -1,0 +1,18 @@
+---
+exportVersion: "1"
+exportId: "8a5e09b97356500f0173dafb845e1c97"
+name: "ProjectRock-SSMParameter"
+runtime: "python"
+entrypoint: "handler"
+description: "ABX creates / updates SSM Parameter 'ProjectRockSite'  & 'ProjectRockDB'.\
+  \  Plan was to use Ansible Playbook to read parameter but found easier to insert\
+  \ Host Variable from vRA into Playbook.  Have left ABX to show what can be done"
+inputs:
+  target: "World"
+timeoutSeconds: 600
+deploymentTimeoutSeconds: 900
+actionType: "SCRIPT"
+provider: "aws"
+configuration:
+  const_aws-iam_role: "ABX_AWSLambdaBasicExecutionRole"
+memoryInMB: 300
