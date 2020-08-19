@@ -1,8 +1,0 @@
----
-exportVersion: "1"
-exportId: "8a5eb3417126ded001717768e5bc3e5b"
-name: "ProjectRock-WorkFlow"
-description: "Workflow ties various ProjectRock ABX actions together"
-timeoutSeconds: 600
-actionType: "FLOW"
-memoryInMB: 300
