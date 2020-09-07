@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.2
+version: 2.3
 formatVersion: 1
 inputs:
   Platform:
@@ -147,6 +147,7 @@ resources:
         - network: '${resource.Web_Priv_Net.id}'
           assignPublicIpAddress: false
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
+      Infoblox.IPAM.createFixedAddress: true
       cloudConfig:
         users:
           - name: projectrock
@@ -169,6 +170,7 @@ resources:
         - network: '${resource.DB_Priv_Net.id}'
           assignPublicIpAddress: false
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
+      Infoblox.IPAM.createFixedAddress: true
       cloudConfig:
         repo_update: true
         repo_upgrade: all
