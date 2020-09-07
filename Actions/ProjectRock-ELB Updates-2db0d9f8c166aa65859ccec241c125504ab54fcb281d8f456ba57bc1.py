@@ -6,8 +6,10 @@ def handler(context, inputs):
     SSLSingapore = "arn:aws:acm:ap-southeast-1:994172548385:certificate/3bae16ae-ac3f-4c42-bc79-5c114777e751"
     SSLSydney = "arn:aws:acm:ap-southeast-2:994172548385:certificate/c7f0a436-f494-4525-a566-fa1da31fc175"
         
-    Region = str(inputs['tags']['Region'])
-    Platform = str(inputs['tags']['Platform'])
+    Region = str(inputs['customProperties']['Region'])
+    Platform = str(inputs['customProperties']['Platform'])
+    LBName = str(inputs['customProperties']['LBName'])
+    print(LBName)
     if Platform == "platform:aws":
       if Region == "region:sydney":
           SSL = SSLSydney
@@ -20,7 +22,7 @@ def handler(context, inputs):
       response = client.describe_load_balancers(LoadBalancerNames=[])
       elb = [elb['LoadBalancerName'] for elb in response['LoadBalancerDescriptions']]
       for x in elb:
-         if "projectrock" in x:
+         if LBName in x:
              print(x)
              response = client.create_load_balancer_listeners(
              LoadBalancerName = x,

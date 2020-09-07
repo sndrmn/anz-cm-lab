@@ -4,7 +4,7 @@ sns = boto3.client('sns')
 
 def handler(context, inputs):
     Updated_Number=(inputs['Updated_Number'])
-    Platform=(inputs['tags']['Platform'])
+    Platform=(inputs['customProperties']['Platform'])
     AWS_Message = 'Project Rock says: Can you smell what vRA is cooking?  Browse to https://' + inputs['DNS'] + ' to find out.  Please allow 1-2 minutes for DNS propogation'
     Azure_Message = 'Project Rock says: Can you smell what vRA is cooking?  Browse to http://' + inputs['DNS'] + ' to find out.  Please allow 1-2 minutes for DNS propogation'
     vSphere_Message = 'Project Rock says: Can you smell what vRA is cooking?  Browse to http://' + inputs['DNS'] + ' to find out - this was an on-prem deployment so VPN is required.  Please allow 1-2 minutes for DNS propogation'

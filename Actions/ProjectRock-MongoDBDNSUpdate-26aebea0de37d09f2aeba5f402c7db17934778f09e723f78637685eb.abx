@@ -4,7 +4,7 @@ exportId: "8a5ed5bf6f1f22d4016f20b04b230b19"
 name: "ProjectRock-MongoDBDNSUpdate"
 runtime: "python"
 entrypoint: "handler"
-description: "ABX updates the Route 53 DNS record for mongodb.vmware.education"
+description: "ABX creates / updates the Route 53 DNS record for mongodb  'customurl+mongodb.vmware.education'"
 inputs:
   target: "World"
 timeoutSeconds: 180

@@ -8,21 +8,24 @@ flow:
       next: [action1, action2]
   action1:
     action: ProjectRock-Route53 Updates
-    next: condition
+    next: join1
   action2:
     action: ProjectRock-ELB Updates
-    next: action4
-  condition:
-    switch:
-     ${tags['SendSMS'] == 'Yes'} : action3
-     ${tags['SendSMS'] == 'No'} : action4
-  action3:
-   action: ProjectRock-SNSNotification
-   next: join1
+    next: join1
   join1:
    join:
     type: all
-    next: flow_end
+    next: condition
+  condition:
+    switch:
+     ${customProperties['SendSMS'] == 'Yes'} : action3
+     ${customProperties['SendSMS'] == 'No'} : action4
+  action3:
+   action: ProjectRock-SNSNotification
+   next: action5
   action4:
     action: ProjectRock-NoNotification
-    next: join1
+    next: action5
+  action5:
+   action: ProjectRock-SSMParameter
+   next: flow_end

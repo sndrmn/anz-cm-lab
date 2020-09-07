@@ -6,8 +6,6 @@ runtime: "python"
 entrypoint: "handler"
 description: "ABX enables SSL on the Load Balancer if the blue print is deployed to\
   \ AWS"
-inputs:
-  target: "World"
 timeoutSeconds: 180
 deploymentTimeoutSeconds: 600
 actionType: "SCRIPT"

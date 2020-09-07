@@ -1,0 +1,14 @@
+---
+exportVersion: "1"
+exportId: "8a5ec49873e08f810174012ead406dbc"
+name: "Projectrock-DNSCleanUp"
+runtime: "python"
+entrypoint: "handler"
+description: "ABX cleans up the AWS Route53 Records created during deployment"
+timeoutSeconds: 600
+deploymentTimeoutSeconds: 900
+actionType: "SCRIPT"
+provider: "aws"
+configuration:
+  const_aws-iam_role: "TheRock-lambdarole-sveenstra"
+memoryInMB: 300

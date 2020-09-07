@@ -4,8 +4,8 @@ exportId: "8a7698386e94bb02016e9f9158f1280f"
 name: "ProjectRock-NoNotification"
 runtime: "python"
 entrypoint: "handler"
-description: "ABX doesn't do anything.   This has been put in place to test conditional\
-  \ action in workflow."
+description: "ABX doesn't do anything.   This has been put in place to show the 2\
+  \ conditional actions in a workflow."
 inputs:
   target: "World"
 timeoutSeconds: 180
