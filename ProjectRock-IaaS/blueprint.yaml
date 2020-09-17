@@ -1,0 +1,93 @@
+name: ProjectRock - IaaS
+version: 1.0
+formatVersion: 1
+inputs:
+  image:
+    type: string
+    title: Operating System
+    oneOf:
+      - title: CentOS 7
+        const: centos7
+      - title: Ubuntu 16.04
+        const: ubuntu1604
+      - title: Windows 2019
+        const: Windows2019
+    default: ubuntu1604
+  VMSize:
+    type: string
+    oneOf:
+      - title: Tiny
+        const: tiny
+      - title: Small
+        const: small
+      - title: Medium
+        const: medium
+      - title: Large
+        const: large
+    default: tiny
+  Quantity:
+    type: integer
+    title: Quantity
+    default: 2
+  disk1Size:
+    type: integer
+    title: Disk1 Size
+    default: 0
+  StorageTier:
+    type: string
+    description: 'Selection does nothing, used to illustrate what is possible'
+    oneOf:
+      - title: Gold
+        const: 'storagetier:gold'
+      - title: Silver
+        const: 'storagetier:silver'
+      - title: Bronze
+        const: 'storagetier:bronze'
+    default: 'storagetier:bronze'
+  platform:
+    type: string
+    title: Platform
+    oneOf:
+      - title: Amazon Web Services
+        const: 'platform:aws'
+      - title: vSphere
+        const: 'platform:vsphere'
+      - title: Microsoft Azure
+        const: 'platform:azure'
+  Network:
+    type: string
+    description: 'Selection does nothing, used to illustrate what is possible'
+    oneOf:
+      - title: Prod
+        const: 'function:public'
+      - title: Test
+        const: 'function:test'
+      - title: Dev
+        const: 'function:dev'
+    default: 'function:public'
+resources:
+  Cloud_Machine_1:
+    type: Cloud.Machine
+    properties:
+      image: '${input.image}'
+      flavor: '${input.VMSize}'
+      count: '${input.Quantity}'
+      constraints:
+        - tag: '${input.platform}'
+        - tag: 'region:sydney'
+      networks:
+        - network: '${resource.Cloud_Network_1.id}'
+      attachedDisks:
+        - source: '${resource.Cloud_Volume_1.id}'
+  Cloud_Volume_1:
+    type: Cloud.Volume
+    properties:
+      capacityGb: '${input.disk1Size}'
+      count: '${input.disk1Size == 0 ? 0 : 1}'
+  Cloud_Network_1:
+    type: Cloud.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: '${input.platform == "platform:vsphere" ? "network:projectrock" : "function:public"}'
+        - tag: '${input.platform}'
