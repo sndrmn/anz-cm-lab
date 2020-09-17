@@ -1,5 +1,5 @@
 name: ProjectRock - IaaS
-version: 1.1
+version: 1.2
 formatVersion: 1
 inputs:
   image:
@@ -78,6 +78,8 @@ resources:
         - tag: 'region:sydney'
       networks:
         - network: '${resource.Cloud_Network_1.id}'
+          assignment: '${input.platform == "platform:vsphere" ? "static" : "dynamic"}'
+      Infoblox.IPAM.createFixedAddress: true
       attachedDisks:
         - source: '${resource.Cloud_Volume_1.id}'
   Cloud_Volume_1:
