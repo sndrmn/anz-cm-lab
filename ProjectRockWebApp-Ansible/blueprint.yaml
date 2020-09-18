@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.3
+version: 2.4
 formatVersion: 1
 inputs:
   Platform:
@@ -170,7 +170,7 @@ resources:
         - network: '${resource.DB_Priv_Net.id}'
           assignPublicIpAddress: false
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
-      Infoblox.IPAM.createFixedAddress: true
+      Infoblox.IPAM.Network.dnsSuffix: test.cmlab.local
       cloudConfig:
         repo_update: true
         repo_upgrade: all
@@ -240,19 +240,19 @@ resources:
     properties:
       networkType: existing
       constraints:
-        - tag: '${input.Platform == "platform:vsphere" ? "function:test" : "function:public"}'
+        - tag: '${input.Platform == "platform:vsphere" ? "network:projectrock" : "function:public"}'
         - tag: '${input.Platform}'
   Web_Priv_Net:
     type: Cloud.Network
     properties:
       networkType: existing
       constraints:
-        - tag: '${input.Platform == "platform:vsphere" ? "function:test" : "function:web-priv"}'
+        - tag: '${input.Platform == "platform:vsphere" ? "network:projectrock" : "function:web-priv"}'
         - tag: '${input.Platform}'
   DB_Priv_Net:
     type: Cloud.Network
     properties:
       networkType: existing
       constraints:
-        - tag: '${input.Platform == "platform:vsphere" ? "function:test" : "function:database"}'
+        - tag: '${input.Platform == "platform:vsphere" ? "network:projectrock" : "function:database"}'
         - tag: '${input.Platform}'
