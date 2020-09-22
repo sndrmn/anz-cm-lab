@@ -1,0 +1,44 @@
+name: ProjectRock - Azure K8s
+version: 1.0
+formatVersion: 1
+inputs:
+  clustername:
+    type: string
+    description: AKS Cluster Name
+  nodecount:
+    type: integer
+    description: AKS Node Number
+    default: 2
+    maximum: 4
+    minimum: 1
+  environment:
+    type: string
+    description: Environment Tag
+    oneOf:
+      - title: Prod
+        const: Prod
+      - title: Test
+        const: Test
+      - title: Dev
+        const: Dev
+    default: Prod
+resources:
+  terraform:
+    type: Cloud.Terraform.Configuration
+    properties:
+      variables:
+        appId: f23019d8-ff15-45eb-b7b6-cb9e44d83d80
+        password: 'vpLyCWt92.b:saVU?g[6ovM2m:u=LVT9'
+        clustername: '${input.clustername}'
+        nodecount: '${input.nodecount}'
+        vmsize: Standard_D2_v2
+        environment: '${input.environment}'
+      providers:
+        - name: azurerm
+          # List of available cloud zones: SDDC ANZ Azure/australiaeast
+          cloudZone: SDDC ANZ Azure/australiaeast
+      terraformVersion: 0.13.2
+      configurationSource:
+        repositoryId: 374f2c12-cd0b-415c-a9be-f29390d92c7b
+        commitId: ade2f8a7fa4504f1989d9e2ee40544884a6630c4
+        sourceDirectory: /azure-aks
