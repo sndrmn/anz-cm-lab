@@ -1,10 +1,20 @@
 name: ProjectRock - Azure K8s
-version: 1.0
+version: 1.1
 formatVersion: 1
 inputs:
   clustername:
     type: string
     description: AKS Cluster Name
+  vmsize:
+    type: string
+    oneOf:
+      - title: Small
+        const: Standard_D2_v2
+      - title: Medium
+        const: Standard_DS3_v2
+      - title: Large
+        const: Standard_D4_v3
+    default: Standard_D2_v2
   nodecount:
     type: integer
     description: AKS Node Number
@@ -31,7 +41,7 @@ resources:
         password: 'vpLyCWt92.b:saVU?g[6ovM2m:u=LVT9'
         clustername: '${input.clustername}'
         nodecount: '${input.nodecount}'
-        vmsize: Standard_D2_v2
+        vmsize: '${input.vmsize}'
         environment: '${input.environment}'
       providers:
         - name: azurerm
