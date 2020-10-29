@@ -1,5 +1,5 @@
 name: TheRock Managed MSSQL
-version: 1.0
+version: 1.1
 formatVersion: 1
 inputs:
   Platform:
@@ -51,6 +51,7 @@ resources:
     properties:
       image: ubuntu1604
       flavor: small
+      DNS: '${env.deploymentName}'
       networks:
         - network: '${resource["Public-Network"].id}'
           assignPublicIpAddress: true
