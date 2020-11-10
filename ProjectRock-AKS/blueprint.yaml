@@ -1,5 +1,5 @@
 name: ProjectRock - Azure K8s
-version: 1.0
+version: 1.1
 formatVersion: 1
 inputs:
   clustername:
@@ -47,5 +47,5 @@ resources:
       terraformVersion: 0.13.2
       configurationSource:
         repositoryId: 374f2c12-cd0b-415c-a9be-f29390d92c7b
-        commitId: ca1ce311d708b23eb98585994b30e958541956ce
+        commitId: c2c1033e613da5952c4b56733757e55c4be26151
         sourceDirectory: /azure-aks
