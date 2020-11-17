@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.4
+version: 2.5
 formatVersion: 1
 inputs:
   Platform:
@@ -235,6 +235,8 @@ resources:
           - rm mongod.conf
           - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/mongod.conf"'
           - systemctl start mongod
+          - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
+          - sudo sh install_salt.sh -A projectrock-saltmaster.vmware.education
   Pub_Net:
     type: Cloud.Network
     properties:
