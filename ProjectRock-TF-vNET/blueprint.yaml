@@ -1,0 +1,49 @@
+name: ProjectRock - Azure vNET
+version: 1.0
+formatVersion: 1
+inputs:
+  network:
+    type: string
+    default: vRA-TF-vNET
+  rgname:
+    type: string
+    default: vRA-TF
+  vnet_address:
+    type: array
+    default:
+      - 172.31.0.0/16
+  subnetname:
+    type: string
+    default: Subnet1
+  subnet_address:
+    type: array
+    default:
+      - 172.31.10.0/24
+  subnetname2:
+    type: string
+    default: Subnet2
+  subnet_address2:
+    type: array
+    default: 
+     - 172.31.20.0/24
+resources:
+  terraform:
+    type: Cloud.Terraform.Configuration
+    properties:
+      variables:
+        network: '${input.network}'
+        rgname: '${input.rgname}'
+        vnet_address: '${input.vnet_address}'
+        subnetname: '${input.subnetname}'
+        subnet_address: '${input.subnet_address}'
+        subnetname2: '${input.subnetname2}'
+        subnet_address2: '${input.subnet_address2}'
+      providers:
+        - name: azurerm
+          # List of available cloud zones: SDDC ANZ Azure/australiaeast
+          cloudZone: SDDC ANZ Azure/australiaeast
+      terraformVersion: 0.13.2
+      configurationSource:
+        repositoryId: e300e474-ccbb-4c67-b7f0-4683e48089e5
+        commitId: 9cf2450422a65ee920ba8311dd1b5641cbbb26fb
+        sourceDirectory: azure-vnet
