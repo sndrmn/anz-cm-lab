@@ -1,5 +1,6 @@
 name: ProjectRock - IaaS
-version: 1.4
+version: 1.5
+description: 
 formatVersion: 1
 inputs:
   image:
@@ -69,6 +70,8 @@ resources:
   Cloud_Machine_1:
     type: Cloud.Machine
     properties:
+      os: '${input.image}'
+      servertype: COMPUTE
       image: '${input.image}'
       flavor: '${input.VMSize}'
       count: '${input.Quantity}'
