@@ -1,0 +1,40 @@
+name: ProjectRock - AWS VPC
+version: 1.0
+formatVersion: 1
+inputs:
+  name:
+    type: string
+    default: vRA TF VPC
+  cidr:
+    type: string
+    default: 172.31.0.0/16
+  public_subnets:
+    type: array
+    default:
+      - 172.31.40.0/24
+      - 172.31.50.0/24
+      - 172.31.60.0/24
+  private_subnets:
+    type: array
+    default:
+      - 172.31.10.0/24
+      - 172.31.20.0/24
+      - 172.31.30.0/24
+resources:
+  terraform:
+    type: Cloud.Terraform.Configuration
+    properties:
+      variables:
+        name: '${input.name}'
+        cidr: '${input.cidr}'
+        private_subnets: '${input.private_subnets}'
+        public_subnets: '${input.public_subnets}'
+      providers:
+        - name: aws
+          # No available cloud zones. Replace <<CHANGE-ME>> with cloud zone info in the following format of "account/region".
+          cloudZone: SDDC ANZ AWS/ap-southeast-2
+      terraformVersion: 0.13.2
+      configurationSource:
+        repositoryId: e300e474-ccbb-4c67-b7f0-4683e48089e5
+        commitId: 3a5f0cffdf19c169fe9e5792890e7be0aef90127
+        sourceDirectory: aws-vpc
