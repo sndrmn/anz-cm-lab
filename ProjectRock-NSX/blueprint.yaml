@@ -1,0 +1,21 @@
+name: ProjectRock - NSX
+version: 1.0
+formatVersion: 1
+inputs:
+  CIDR:
+    type: string
+    title: CIDR
+    default: 10.10.10.0/24
+  tag:
+    type: string
+    default: vRA-NSX-OnDemand
+resources:
+  NSXNetwork:
+    type: Cloud.NSX.Network
+    properties:
+      networkType: routed
+      name: '${input.CIDR}'
+      tags:
+        - key: name
+          value: '${input.tag}'
+      networkCidr: '${input.CIDR}'
