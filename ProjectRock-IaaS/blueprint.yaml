@@ -1,5 +1,5 @@
 name: ProjectRock - IaaS
-version: 1.5
+version: 1.6
 description: 
 formatVersion: 1
 inputs:
@@ -54,7 +54,7 @@ inputs:
         const: 'platform:vsphere'
       - title: Microsoft Azure
         const: 'platform:azure'
-    default: 'platform:vsphere'
+    default: 'platform:aws'
   Network:
     type: string
     description: 'Selection does nothing, used to illustrate what is possible'
