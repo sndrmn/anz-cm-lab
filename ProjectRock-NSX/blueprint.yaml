@@ -1,11 +1,11 @@
 name: ProjectRock - NSX
-version: 1.0
+version: 1.1
 formatVersion: 1
 inputs:
   CIDR:
     type: string
     title: CIDR
-    default: 10.10.10.0/24
+    default: 10.10.20.0/24
   tag:
     type: string
     default: vRA-NSX-OnDemand
@@ -19,3 +19,5 @@ resources:
         - key: name
           value: '${input.tag}'
       networkCidr: '${input.CIDR}'
+
+    
