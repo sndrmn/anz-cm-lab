@@ -1,5 +1,5 @@
 name: ProjectRock - MSSQL PaaS
-version: 1.5
+version: 1.6
 formatVersion: 1
 inputs:
   Platform:
@@ -59,9 +59,15 @@ resources:
           - 'add-apt-repository ppa:ondrej/php -y'
           - 'curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -'
           - 'curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list'
+          - 'curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -'
+          - 'curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list'
           - apt-get update
           - ACCEPT_EULA=Y apt-get -y install msodbcsql17
+          - ACCEPT_EULA=y DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mssql-tools 
           - apt-get install libapache2-mod-php7.4 php7.4 unixodbc-dev php-dev php-xml php-pear -y --allow-unauthenticated
+          - echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+          - echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+          - source ~/.bashrc
           - pecl install sqlsrv
           - pecl install pdo_sqlsrv
           - a2dismod php7.0
