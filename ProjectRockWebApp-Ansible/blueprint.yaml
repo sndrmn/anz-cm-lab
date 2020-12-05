@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.7
+version: 2.71
 formatVersion: 1
 inputs:
   Platform:
@@ -159,6 +159,12 @@ resources:
               - 'ALL=(ALL) NOPASSWD:ALL'
             groups: sudo
             shell: /bin/bash
+        write_files:
+          - path: /home/projectrock/rename.sh
+            content: |
+              num=$(($RANDOM % 100))
+              hostnamectl set-hostname projectrock-db$num.vmware.education
+              EOF
   Mongo_DB:
     type: Cloud.Machine
     properties:
@@ -220,20 +226,28 @@ resources:
               db.createUser(user2);
               exit
               EOF
+          - path: /home/projectrock/rename.sh
+            content: |
+              num=$(($RANDOM % 100))
+              hostnamectl set-hostname projectrock-db$num.vmware.education
+              EOF
         runcmd:
           - cd /var/tmp
           - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/MovieList.json"'
           - 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 4B7C549A058F8B6B'
           - 'echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb.list'
           - apt-get update
-          - apt install mongodb-org -y
+          - apt install libnorm1 libpgm-5.2-0 libzmq5 python-pyinotify mongodb-org -y --allow-unauthenticated
           - systemctl enable mongod
           - systemctl start mongod
           - mongoimport --db RockMovies --collection movies --file MovieList.json
           - cd /home/projectrock
           - chmod +x mongousers.sh
+          - chmod +x rename.sh
           - ./mongousers.sh
+          - bash rename.sh
           - rm mongousers.sh
+          - rm rename.sh
           - systemctl stop mongod
           - cd /etc
           - rm mongod.conf
