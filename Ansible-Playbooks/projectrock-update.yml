@@ -1,0 +1,33 @@
+---
+- hosts: projectrock_web
+  become: yes
+  become_method: sudo
+
+  gather_facts: False
+
+  tasks:
+    - name:  Stop Apache2
+      systemd:
+         name: apache2
+         state: stopped
+
+    - name: Delete Contents for /var/www/html
+      shell: /bin/rm -rf /var/www/html/*
+      ignore_errors: yes
+ 
+    - name: Delete Contents for /var/www/html
+      shell: /bin/rm -rf /var/www/html/.*
+      ignore_errors: yes
+
+    - name: Git Clone
+      git:
+        repo: https://github.com/sndrmn/ProjectRock.git
+        dest: /var/www/html
+        clone: yes
+
+    - name:  Start Apache2
+      systemd:
+         name: apache2
+         state: started
+
+
