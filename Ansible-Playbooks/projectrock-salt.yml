@@ -30,6 +30,30 @@
       args:
        executable: /bin/bash
 
+    - name: Install libnorm1
+      apt:
+        name: libnorm1
+        state: present
+        force: yes
+    
+    - name: Install libpgm-5.2-0
+      apt:
+        name: libpgm-5.2-0
+        state: present
+        force: yes
+    
+    - name: Install libzmq5
+      apt:
+        name: libzmq5
+        state: present
+        force: yes
+    
+    - name: Install python-pyinotify
+      apt:
+        name: python-pyinotify
+        state: present
+        force: yes
+
     - name: Install apache httpd  
       apt:
         name: apache2
