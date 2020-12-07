@@ -138,8 +138,6 @@ resources:
   Web_Servers:
     type: Cloud.Machine
     properties:
-      os: UBUNTU 
-      servertype: WEB
       image: ubuntu1604
       flavor: '${input.WebCompute}'
       count: 2
@@ -162,8 +160,6 @@ resources:
   Mongo_DB:
     type: Cloud.Machine
     properties:
-      os: UBUNTU 
-      servertype: DATABASE
       mongodb: 'true'
       DNS: '${env.deploymentName}'
       image: ubuntu1604
