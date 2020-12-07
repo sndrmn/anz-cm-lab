@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.72
+version: 2.73
 formatVersion: 1
 inputs:
   Platform:
@@ -102,7 +102,7 @@ resources:
         - projectrock_web
       playbooks:
         provision:
-          - /home/socialab/projectrock/projectrock.yml
+          - /home/socialab/projectrock/projectrock-salt.yml
       hostVariables: |
         website: '${env.deploymentName}'
       inventoryFile: /home/socialab/hosts
