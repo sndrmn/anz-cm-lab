@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.73
+version: 2.8
 formatVersion: 1
 inputs:
   Platform:
@@ -102,7 +102,7 @@ resources:
         - projectrock_web
       playbooks:
         provision:
-          - /home/socialab/projectrock/projectrock-salt.yml
+          - /home/socialab/projectrock/projectrock.yml
       hostVariables: |
         website: '${env.deploymentName}'
       inventoryFile: /home/socialab/hosts
@@ -220,11 +220,6 @@ resources:
               db.createUser(user2);
               exit
               EOF
-          - path: /home/projectrock/rename.sh
-            content: |
-              num=$(($RANDOM % 100))
-              hostnamectl set-hostname projectrock-db$num.vmware.education
-              EOF
         runcmd:
           - cd /var/tmp
           - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/MovieList.json"'
@@ -247,8 +242,6 @@ resources:
           - rm mongod.conf
           - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/mongod.conf"'
           - systemctl start mongod
-          - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
-          - sudo sh install_salt.sh -A projectrock-saltmaster.vmware.education
   Pub_Net:
     type: Cloud.Network
     properties:
