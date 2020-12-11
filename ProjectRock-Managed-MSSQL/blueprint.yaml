@@ -1,5 +1,6 @@
 name: ProjectRock - MSSQL PaaS
-version: 1.6
+version: 1.7
+description: MSSQL PaaS Request
 formatVersion: 1
 inputs:
   Platform:
@@ -64,9 +65,7 @@ resources:
           - apt-get update
           - ACCEPT_EULA=Y apt-get -y install msodbcsql17
           - ACCEPT_EULA=y DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mssql-tools 
-          - apt-get install libapache2-mod-php7.4 php7.4 unixodbc-dev php-dev php-xml php-pear -y --allow-unauthenticated
-          - echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
-          - echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+          - apt-get install php7.4 unixodbc-dev php-dev php-xml php-pear -y --allow-unauthenticated
           - source ~/.bashrc
           - pecl install sqlsrv
           - pecl install pdo_sqlsrv
@@ -83,6 +82,7 @@ resources:
           - rm index.html
           - 'git clone https://github.com/sndrmn/ProjectRockMSSQL.git .'
           - systemctl restart apache2
+          - ln -sfn /opt/mssql-tools/bin/sqlcmd /usr/bin/sqlcmd
   AWS-RDS-MSSQL:
     type: Cloud.Service.AWS.DB.Instance
     properties:
