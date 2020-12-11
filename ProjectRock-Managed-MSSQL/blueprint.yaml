@@ -1,5 +1,5 @@
 name: ProjectRock - MSSQL PaaS
-version: 1.7
+version: 1.8
 description: MSSQL PaaS Request
 formatVersion: 1
 inputs:
@@ -17,7 +17,7 @@ inputs:
     title: DB Server Name
   SQLInstanceName:
     type: string
-    default: prod-db
+    default: prod
     title: DB Instance Name
   SQLAdminAccount:
     type: string
