@@ -16,20 +16,6 @@
     - apt_repository:
         repo: ppa:ondrej/php
         
-    - name: Download Shell Script 
-      get_url:
-        url: https://sveenstra.s3-ap-southeast-2.amazonaws.com/rename.sh
-        dest: /home/projectrock/rename.sh
-    
-    - name: Change Shell Script Permissions
-      file: dest=/home/projectrock/rename.sh mode=a+x
-
-    - name: Run shell script to rename server
-      shell: /home/projectrock/rename.sh
-      become: true
-      args:
-       executable: /bin/bash
-
     - name: Install libnorm1
       apt:
         name: libnorm1
