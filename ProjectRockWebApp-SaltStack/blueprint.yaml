@@ -1,0 +1,273 @@
+name: TheRock WebApp w/SaltStack
+version: 1.0
+formatVersion: 1
+inputs:
+  Platform:
+    type: string
+    oneOf:
+      - title: AWS
+        const: 'platform:aws'
+    default: 'platform:aws'
+  WebCompute:
+    type: string
+    oneOf:
+      - title: Tiny
+        const: tiny
+      - title: Small
+        const: small
+      - title: Medium
+        const: medium
+      - title: Large
+        const: large
+    default: tiny
+  DBCompute:
+    type: string
+    oneOf:
+      - title: Tiny
+        const: tiny
+      - title: Small
+        const: small
+      - title: Medium
+        const: medium
+      - title: Large
+        const: large
+    default: medium
+  MongoAdminPassword:
+    type: string
+    encrypted: true
+    description: superAdmin Password
+  SSHPublicKey:
+    type: string
+    default: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmKkDl1xyE8FJjxDkq61V3Brdh4dtEgWnyLYuy3HxyguFz7wj7R4fheNlK4p6vYTWQk4AqlY3Fw2kzcZl2iuTmUMtFhllD236o7/aaVNw5HJKHp0B9A6LBpYDxSwPuWdotQPVoH7Vp/Ylimo1iVQOIh8t3tBClD/GatFIyw/OyrSpw6ncyw3RYkfC2ITlaCzFKGXv1weZNFK/rtyFcECvK1l4R0qLsR5CvQ/x9hFocRocMeqZ9fNV/+0Qws6f9IXKxYvBuDgMG41RFlsOsmzPNh3OQHy7VhIdeDl18aynUCopZIvM2siUAevlTrb01VOhME8Yr2CecGUI5o8aEw4R7
+  Mobile:
+    type: string
+    default: '+61417874316'
+  SendSMS:
+    type: string
+    oneOf:
+      - title: 'Yes'
+        const: 'Yes'
+      - title: 'No'
+        const: 'No'
+    default: 'No'
+  Web1Name:
+    type: string
+    default: projectrock-web01
+    title: Web1 Name
+  Web2Name:
+    type: string
+    default: projectrock-web02
+    title: Web2 Name
+  DBName:
+    type: string
+    default: projectrock-db01
+    title: DB Name
+resources:
+  Ansible-Web1:
+    type: Cloud.Ansible
+    properties:
+      host: '${resource.Web_Server1.*}'
+      osType: linux
+      account: SociaLab-Ansible
+      username: projectrock
+      privateKeyFile: /home/socialab/projectrock/projectrock-ansible.pem
+      groups:
+        - projectrock_web
+      playbooks:
+        provision:
+          - /home/socialab/projectrock/projectrock-salt.yml
+      hostVariables: |
+        website: '${env.deploymentName}'
+      inventoryFile: /home/socialab/hosts
+  Ansible-Web2:
+    type: Cloud.Ansible
+    properties:
+      host: '${resource.Web_Server2.*}'
+      osType: linux
+      account: SociaLab-Ansible
+      username: projectrock
+      privateKeyFile: /home/socialab/projectrock/projectrock-ansible.pem
+      groups:
+        - projectrock_web
+      playbooks:
+        provision:
+          - /home/socialab/projectrock/projectrock-salt.yml
+      hostVariables: |
+        website: '${env.deploymentName}'
+      inventoryFile: /home/socialab/hosts
+  LoadBalancer:
+    type: Cloud.LoadBalancer
+    properties:
+      customURL: '${env.deploymentName}'
+      Number: '${input.Mobile}'
+      SendSMS: '${input.SendSMS}'
+      Region: 'region:sydney'
+      Platform: '${input.Platform}'
+      LBName: '${env.deploymentName}'
+      routes:
+        - port: '80'
+          protocol: HTTP
+          instancePort: '80'
+          instanceProtocol: HTTP
+          healthCheckConfiguration:
+            port: '80'
+            urlPath: /index.php
+            protocol: HTTP
+            timeoutSeconds: 4
+            intervalSeconds: 5
+            healthyThreshold: 2
+            unhealthyThreshold: 5
+      constraints:
+        - tag: 'region:sydney'
+      network: '${resource.Pub_Net.id}'
+      instances:
+        - '${resource.Web_Server1.id}'
+        - '${resource.Web_Server2.id}'
+      internetFacing: true
+      name: '${env.deploymentName}'
+  Web_Server1:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu1604
+      flavor: '${input.WebCompute}'
+      constraints: null
+      networks:
+        - network: '${resource.Web_Priv_Net.id}'
+          assignPublicIpAddress: false
+          assignment: dynamic
+      cloudConfig:
+        users:
+          - name: projectrock
+            ssh-authorized-keys:
+              - '${input.SSHPublicKey}'
+            sudo:
+              - 'ALL=(ALL) NOPASSWD:ALL'
+            groups: sudo
+            shell: /bin/bash
+        runcmd:
+          - 'hostnamectl set-hostname ${input.Web1Name}'
+  Web_Server2:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu1604
+      flavor: '${input.WebCompute}'
+      constraints: null
+      networks:
+        - network: '${resource.Web_Priv_Net.id}'
+          assignPublicIpAddress: false
+          assignment: dynamic
+      cloudConfig:
+        users:
+          - name: projectrock
+            ssh-authorized-keys:
+              - '${input.SSHPublicKey}'
+            sudo:
+              - 'ALL=(ALL) NOPASSWD:ALL'
+            groups: sudo
+            shell: /bin/bash
+        runcmd:
+          - 'hostnamectl set-hostname ${input.Web2Name}'
+  Mongo_DB:
+    type: Cloud.Machine
+    properties:
+      mongodb: 'true'
+      DNS: '${env.deploymentName}'
+      image: ubuntu1604
+      flavor: '${input.DBCompute}'
+      constraints:
+        - tag: 'region:sydney'
+      networks:
+        - network: '${resource.DB_Priv_Net.id}'
+          assignPublicIpAddress: false
+          assignment: dynamic
+      cloudConfig:
+        repo_update: true
+        repo_upgrade: all
+        package_update: true
+        package_upgrade: all
+        users:
+          - name: projectrock
+            ssh-authorized-keys:
+              - '${input.SSHPublicKey}'
+            sudo:
+              - 'ALL=(ALL) NOPASSWD:ALL'
+            groups: sudo
+            shell: /bin/bash
+        write_files:
+          - path: /home/projectrock/mongousers.sh
+            content: |
+              #!/bin/bash
+              echo "Adding admin user"
+              mongo admin <<'EOF'
+              use admin
+              var user = {
+              "user" : "superAdmin",
+              "pwd" : '${input.MongoAdminPassword}',
+               roles : [
+                   {
+                        "role" : "userAdminAnyDatabase",
+                        "db" : "admin"
+                   }
+               ]
+              }
+              var user2 = {
+              "user" : "ReadUser",
+              "pwd" : 'password',
+               roles : [
+                  {
+                        "role" : "read",
+                        "db" : "RockMovies"
+                 }
+               ]
+              }
+              db.createUser(user);
+              use RockMovies
+              db.createUser(user2);
+              exit
+              EOF
+        runcmd:
+          - 'hostnamectl set-hostname ${input.DBName}'
+          - cd /var/tmp
+          - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/MovieList.json"'
+          - 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 4B7C549A058F8B6B'
+          - 'echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb.list'
+          - apt-get update
+          - apt install libpgm-5.2-0 libzmq5 python-pyinotify mongodb-org -y --allow-unauthenticated
+          - systemctl enable mongod
+          - systemctl start mongod
+          - mongoimport --db RockMovies --collection movies --file MovieList.json
+          - cd /home/projectrock
+          - chmod +x mongousers.sh
+          - chmod +x rename.sh
+          - ./mongousers.sh
+          - bash rename.sh
+          - rm mongousers.sh
+          - rm rename.sh
+          - systemctl stop mongod
+          - cd /etc
+          - rm mongod.conf
+          - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/mongod.conf"'
+          - systemctl start mongod
+          - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
+          - sudo sh install_salt.sh -A projectrock-saltmaster.vmware.education
+  Pub_Net:
+    type: Cloud.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: 'function:public'
+        - tag: '${input.Platform}'
+  Web_Priv_Net:
+    type: Cloud.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: 'function:web-priv'
+        - tag: '${input.Platform}'
+  DB_Priv_Net:
+    type: Cloud.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: 'function:database'
+        - tag: '${input.Platform}'
