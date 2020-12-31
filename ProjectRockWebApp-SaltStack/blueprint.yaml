@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 1.0
+version: 1.1
 formatVersion: 1
 inputs:
   Platform:
@@ -63,38 +63,6 @@ inputs:
     default: projectrock-db01
     title: DB Name
 resources:
-  Ansible-Web1:
-    type: Cloud.Ansible
-    properties:
-      host: '${resource.Web_Server1.*}'
-      osType: linux
-      account: SociaLab-Ansible
-      username: projectrock
-      privateKeyFile: /home/socialab/projectrock/projectrock-ansible.pem
-      groups:
-        - projectrock_web
-      playbooks:
-        provision:
-          - /home/socialab/projectrock/projectrock-salt.yml
-      hostVariables: |
-        website: '${env.deploymentName}'
-      inventoryFile: /home/socialab/hosts
-  Ansible-Web2:
-    type: Cloud.Ansible
-    properties:
-      host: '${resource.Web_Server2.*}'
-      osType: linux
-      account: SociaLab-Ansible
-      username: projectrock
-      privateKeyFile: /home/socialab/projectrock/projectrock-ansible.pem
-      groups:
-        - projectrock_web
-      playbooks:
-        provision:
-          - /home/socialab/projectrock/projectrock-salt.yml
-      hostVariables: |
-        website: '${env.deploymentName}'
-      inventoryFile: /home/socialab/hosts
   LoadBalancer:
     type: Cloud.LoadBalancer
     properties:
@@ -146,6 +114,9 @@ resources:
             shell: /bin/bash
         runcmd:
           - 'hostnamectl set-hostname ${input.Web1Name}'
+          - cd /home/projectrock
+          - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
+          - sh install_salt.sh -A projectrock-saltmaster.vmware.education
   Web_Server2:
     type: Cloud.Machine
     properties:
@@ -167,6 +138,9 @@ resources:
             shell: /bin/bash
         runcmd:
           - 'hostnamectl set-hostname ${input.Web2Name}'
+          - cd /home/projectrock
+          - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
+          - sh install_salt.sh -A projectrock-saltmaster.vmware.education
   Mongo_DB:
     type: Cloud.Machine
     properties:
@@ -238,18 +212,15 @@ resources:
           - mongoimport --db RockMovies --collection movies --file MovieList.json
           - cd /home/projectrock
           - chmod +x mongousers.sh
-          - chmod +x rename.sh
           - ./mongousers.sh
-          - bash rename.sh
           - rm mongousers.sh
-          - rm rename.sh
           - systemctl stop mongod
           - cd /etc
           - rm mongod.conf
           - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/mongod.conf"'
           - systemctl start mongod
           - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
-          - sudo sh install_salt.sh -A projectrock-saltmaster.vmware.education
+          - sh install_salt.sh -A projectrock-saltmaster.vmware.education
   Pub_Net:
     type: Cloud.Network
     properties:
