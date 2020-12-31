@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 1.1
+version: 1.2
 formatVersion: 1
 inputs:
   Platform:
@@ -104,14 +104,6 @@ resources:
           assignPublicIpAddress: false
           assignment: dynamic
       cloudConfig:
-        users:
-          - name: projectrock
-            ssh-authorized-keys:
-              - '${input.SSHPublicKey}'
-            sudo:
-              - 'ALL=(ALL) NOPASSWD:ALL'
-            groups: sudo
-            shell: /bin/bash
         runcmd:
           - 'hostnamectl set-hostname ${input.Web1Name}'
           - cd /home/projectrock
@@ -128,14 +120,6 @@ resources:
           assignPublicIpAddress: false
           assignment: dynamic
       cloudConfig:
-        users:
-          - name: projectrock
-            ssh-authorized-keys:
-              - '${input.SSHPublicKey}'
-            sudo:
-              - 'ALL=(ALL) NOPASSWD:ALL'
-            groups: sudo
-            shell: /bin/bash
         runcmd:
           - 'hostnamectl set-hostname ${input.Web2Name}'
           - cd /home/projectrock
