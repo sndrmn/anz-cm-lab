@@ -146,7 +146,7 @@ resources:
         users:
           - name: projectrock
             ssh-authorized-keys:
-              - '${input.SSHPublicKey}'
+              - 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmKkDl1xyE8FJjxDkq61V3Brdh4dtEgWnyLYuy3HxyguFz7wj7R4fheNlK4p6vYTWQk4AqlY3Fw2kzcZl2iuTmUMtFhllD236o7/aaVNw5HJKHp0B9A6LBpYDxSwPuWdotQPVoH7Vp/Ylimo1iVQOIh8t3tBClD/GatFIyw/OyrSpw6ncyw3RYkfC2ITlaCzFKGXv1weZNFK/rtyFcECvK1l4R0qLsR5CvQ/x9hFocRocMeqZ9fNV/+0Qws6f9IXKxYvBuDgMG41RFlsOsmzPNh3OQHy7VhIdeDl18aynUCopZIvM2siUAevlTrb01VOhME8Yr2CecGUI5o8aEw4R7'
             sudo:
               - 'ALL=(ALL) NOPASSWD:ALL'
             groups: sudo
