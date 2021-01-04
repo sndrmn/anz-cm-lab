@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 1.4
+version: 1.5
 formatVersion: 1
 inputs:
   Platform:
@@ -138,70 +138,8 @@ resources:
           assignPublicIpAddress: false
           assignment: dynamic
       cloudConfig:
-        repo_update: true
-        repo_upgrade: all
-        package_update: true
-        package_upgrade: all
-        users:
-          - name: projectrock
-            ssh-authorized-keys:
-              - 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmKkDl1xyE8FJjxDkq61V3Brdh4dtEgWnyLYuy3HxyguFz7wj7R4fheNlK4p6vYTWQk4AqlY3Fw2kzcZl2iuTmUMtFhllD236o7/aaVNw5HJKHp0B9A6LBpYDxSwPuWdotQPVoH7Vp/Ylimo1iVQOIh8t3tBClD/GatFIyw/OyrSpw6ncyw3RYkfC2ITlaCzFKGXv1weZNFK/rtyFcECvK1l4R0qLsR5CvQ/x9hFocRocMeqZ9fNV/+0Qws6f9IXKxYvBuDgMG41RFlsOsmzPNh3OQHy7VhIdeDl18aynUCopZIvM2siUAevlTrb01VOhME8Yr2CecGUI5o8aEw4R7'
-            sudo:
-              - 'ALL=(ALL) NOPASSWD:ALL'
-            groups: sudo
-            shell: /bin/bash
-        write_files:
-          - path: /home/projectrock/mongousers.sh
-            content: |
-              #!/bin/bash
-              echo "Adding admin user"
-              mongo admin <<'EOF'
-              use admin
-              var user = {
-              "user" : "superAdmin",
-              "pwd" : '${input.MongoAdminPassword}',
-               roles : [
-                   {
-                        "role" : "userAdminAnyDatabase",
-                        "db" : "admin"
-                   }
-               ]
-              }
-              var user2 = {
-              "user" : "ReadUser",
-              "pwd" : 'password',
-               roles : [
-                  {
-                        "role" : "read",
-                        "db" : "RockMovies"
-                 }
-               ]
-              }
-              db.createUser(user);
-              use RockMovies
-              db.createUser(user2);
-              exit
-              EOF
         runcmd:
           - 'hostnamectl set-hostname ${input.DBName}'
-          - cd /var/tmp
-          - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/MovieList.json"'
-          - 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 4B7C549A058F8B6B'
-          - 'echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb.list'
-          - apt-get update
-          - apt install libpgm-5.2-0 libzmq5 python-pyinotify mongodb-org -y --allow-unauthenticated
-          - systemctl enable mongod
-          - systemctl start mongod
-          - mongoimport --db RockMovies --collection movies --file MovieList.json
-          - cd /home/projectrock
-          - chmod +x mongousers.sh
-          - ./mongousers.sh
-          - rm mongousers.sh
-          - systemctl stop mongod
-          - cd /etc
-          - rm mongod.conf
-          - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/mongod.conf"'
-          - systemctl start mongod
           - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
           - sh install_salt.sh -A projectrock-saltmaster.vmware.education
   Pub_Net:
