@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 1.7
+version: 1.8
 formatVersion: 1
 inputs:
   Platform:
@@ -8,6 +8,14 @@ inputs:
       - title: AWS
         const: 'platform:aws'
     default: 'platform:aws'
+  OperatingSystem:
+    type: string
+    oneOf:
+      - title: Linux
+        const: linux
+      - title: Windows
+        const: windows
+    default: linux
   WebCompute:
     type: string
     oneOf:
@@ -96,6 +104,8 @@ resources:
       instances:
         - '${resource.Web_Server1.id}'
         - '${resource.Web_Server2.id}'
+        - '${resource.Win_Web_Server1.id}'
+        - '${resource.Win_Web_Server2.id}'
       internetFacing: true
       name: '${env.deploymentName}'
   Web_Server1:
@@ -113,6 +123,24 @@ resources:
           - 'hostnamectl set-hostname ${input.Web1Name}'
           - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
           - sh install_salt.sh -A projectrock-saltmaster.vmware.education
+      count: '${input.OperatingSystem == "linux" ? 1 : 0}'
+  Win_Web_Server1:
+    type: Cloud.Machine
+    properties:
+      image: Windows2019
+      flavor: '${input.WebCompute}'
+      constraints: null
+      networks:
+        - network: '${resource.Web_Priv_Net.id}'
+          assignPublicIpAddress: false
+          assignment: dynamic
+      cloudConfig: |
+        <powershell>
+        Invoke-WebRequest -Uri "https://repo.saltstack.com/windows/Salt-Minion-3002.2-Py3-AMD64.msi" -OutFile "c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi" 
+        msiexec /i c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.Web1Name}
+        Rename-Computer -NewName "${input.Web1Name}"
+        </powershell>
+      count: '${input.OperatingSystem == "windows" ? 1 : 0}'
   Web_Server2:
     type: Cloud.Machine
     properties:
@@ -128,6 +156,24 @@ resources:
           - 'hostnamectl set-hostname ${input.Web2Name}'
           - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
           - sh install_salt.sh -A projectrock-saltmaster.vmware.education
+      count: '${input.OperatingSystem == "linux" ? 1 : 0}'
+  Win_Web_Server2:
+    type: Cloud.Machine
+    properties:
+      image: Windows2019
+      flavor: '${input.WebCompute}'
+      constraints: null
+      networks:
+        - network: '${resource.Web_Priv_Net.id}'
+          assignPublicIpAddress: false
+          assignment: dynamic
+      cloudConfig: |
+        <powershell>
+        Invoke-WebRequest -Uri "https://repo.saltstack.com/windows/Salt-Minion-3002.2-Py3-AMD64.msi" -OutFile "c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi" 
+        msiexec /i c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.Web2Name}
+        Rename-Computer -NewName "${input.Web2Name}"
+        </powershell>
+      count: '${input.OperatingSystem == "windows" ? 1 : 0}'
   Mongo_DB:
     type: Cloud.Machine
     properties:
@@ -146,6 +192,7 @@ resources:
           - 'hostnamectl set-hostname ${input.DBName}'
           - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
           - sh install_salt.sh -A projectrock-saltmaster.vmware.education
+      count: '${input.OperatingSystem == "linux" ? 1 : 0}'
   Pub_Net:
     type: Cloud.Network
     properties:
