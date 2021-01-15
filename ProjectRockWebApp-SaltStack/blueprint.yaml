@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 1.8
+version: 1.9
 formatVersion: 1
 inputs:
   Platform:
@@ -59,15 +59,15 @@ inputs:
     default: 'No'
   Web1Name:
     type: string
-    default: projectrock-web01
+    default: pr-lin-web01
     title: Web1 Name
   Web2Name:
     type: string
-    default: projectrock-web02
+    default: pr-lin-web02
     title: Web2 Name
   DBName:
     type: string
-    default: projectrock-db01
+    default: pr-lin-db01
     title: DB Name
 resources:
   LoadBalancer:
