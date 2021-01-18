@@ -1,5 +1,5 @@
 name: ProjectRock - MSSQL PaaS
-version: 1.8
+version: 1.9
 description: MSSQL PaaS Request
 formatVersion: 1
 inputs:
@@ -40,14 +40,6 @@ resources:
         - network: '${resource["Public-Network"].id}'
           assignPublicIpAddress: true
       cloudConfig:
-        repo_update: true
-        repo_upgrade: all
-        package_update: true
-        package_upgrade: all
-        packages:
-          - apache2
-          - libapache2-mod-php7.4
-          - git-core
         users:
           - name: projectrock
             ssh-authorized-keys:
@@ -57,31 +49,38 @@ resources:
             groups: sudo
             shell: /bin/bash
         runcmd:
-          - 'add-apt-repository ppa:ondrej/php -y'
-          - 'curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -'
-          - 'curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list'
-          - 'curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -'
-          - 'curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list'
+          - sudo su 
+          - add-apt-repository ppa:ondrej/php -y
           - apt-get update
-          - ACCEPT_EULA=Y apt-get -y install msodbcsql17
-          - ACCEPT_EULA=y DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends mssql-tools 
-          - apt-get install php7.4 unixodbc-dev php-dev php-xml php-pear -y --allow-unauthenticated
+          - apt-get install php7.4 php7.4-dev php7.4-xml -y --allow-unauthenticated
+          - curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+          - curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+          - exit 
+          - sudo apt-get update
+          - sudo ACCEPT_EULA=Y apt-get install msodbcsql17
+          - sudo ACCEPT_EULA=Y apt-get install mssql-tools
+          - echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+          - echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
           - source ~/.bashrc
-          - pecl install sqlsrv
-          - pecl install pdo_sqlsrv
-          - a2dismod php7.0
+          - sudo apt-get install unixodbc-dev -y
+          - sudo pecl install sqlsrv
+          - sudo pecl install pdo_sqlsrv
+          - sudo su
+          - printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/7.4/mods-available/sqlsrv.ini
+          - printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/7.4/mods-available/pdo_sqlsrv.ini
+          - exit
+          - sudo phpenmod -v 7.4 sqlsrv pdo_sqlsrv
+          - sudo su
+          - apt-get install libapache2-mod-php7.4 apache2 -y
           - a2dismod mpm_event
           - a2enmod mpm_prefork
           - a2enmod php7.4
-          - echo "extension=sqlsrv.so" >> /etc/php/7.4/apache2/php.ini
-          - echo "extension=pdo_sqlsrv.so" >> /etc/php/7.4/apache2/php.ini
-          - printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/7.4/mods-available/sqlsrv.ini
-          - printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/7.4/mods-available/pdo_sqlsrv.ini
-          - phpenmod -v 7.4 sqlsrv pdo_sqlsrv
+          - exit
           - cd /var/www/html
           - rm index.html
+          - sudo apt-get install git-clone -y
           - 'git clone https://github.com/sndrmn/ProjectRockMSSQL.git .'
-          - systemctl restart apache2
+          - sudo service apache2 restart
           - ln -sfn /opt/mssql-tools/bin/sqlcmd /usr/bin/sqlcmd
   AWS-RDS-MSSQL:
     type: Cloud.Service.AWS.DB.Instance
