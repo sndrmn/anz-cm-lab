@@ -1,5 +1,5 @@
 name: ProjectRock - MSSQL PaaS
-version: 2.0
+version: 2.1
 description: MSSQL PaaS Request
 formatVersion: 1
 inputs:
@@ -60,6 +60,7 @@ resources:
           - echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
           - echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
           - source ~/.bashrc
+          - ln -sfn /opt/mssql-tools/bin/sqlcmd /usr/bin/sqlcmd
           - apt-get install unixodbc-dev -y
           - pecl install sqlsrv
           - pecl install pdo_sqlsrv
