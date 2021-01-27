@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 2.0
+version: 2.1
 formatVersion: 1
 inputs:
   Platform:
@@ -208,7 +208,6 @@ resources:
         <powershell>
         Invoke-WebRequest -Uri "https://repo.saltstack.com/windows/Salt-Minion-3002.2-Py3-AMD64.msi" -OutFile "c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi" 
         msiexec /i c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.DBName}
-        Rename-Computer -NewName "${input.DBName}"
         </powershell>
       count: '${input.OperatingSystem == "windows" ? 1 : 0}'
   Pub_Net:
