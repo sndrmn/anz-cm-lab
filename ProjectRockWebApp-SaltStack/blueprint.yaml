@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 1.9
+version: 2.0
 formatVersion: 1
 inputs:
   Platform:
@@ -193,6 +193,24 @@ resources:
           - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
           - sh install_salt.sh -A projectrock-saltmaster.vmware.education
       count: '${input.OperatingSystem == "linux" ? 1 : 0}'
+  MSSQL_DB:
+    type: Cloud.Machine
+    properties:
+      mssql: 'true'
+      image: Windows2019
+      flavor: '${input.DBCompute}'
+      constraints: null
+      networks:
+        - network: '${resource.DB_Priv_Net.id}'
+          assignPublicIpAddress: false
+          assignment: dynamic
+      cloudConfig: |
+        <powershell>
+        Invoke-WebRequest -Uri "https://repo.saltstack.com/windows/Salt-Minion-3002.2-Py3-AMD64.msi" -OutFile "c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi" 
+        msiexec /i c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.DBName}
+        Rename-Computer -NewName "${input.DBName}"
+        </powershell>
+      count: '${input.OperatingSystem == "windows" ? 1 : 0}'
   Pub_Net:
     type: Cloud.Network
     properties:
