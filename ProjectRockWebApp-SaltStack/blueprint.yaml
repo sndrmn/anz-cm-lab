@@ -43,7 +43,7 @@ inputs:
   DBPassword:
     type: string
     description: SA Password for MSSQL / superAdmin password for MongoDB
-  WindowsPasword:
+  WindowsPassword:
     type: string
     description: Password for Windows User ProjectRock
   SSHPublicKey:
