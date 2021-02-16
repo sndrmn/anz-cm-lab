@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 2.4
+version: 2.5
 formatVersion: 1
 inputs:
   Platform:
@@ -7,6 +7,10 @@ inputs:
     oneOf:
       - title: AWS
         const: 'platform:aws'
+      - title: Azure
+        const: 'platform:azure'
+      - title: vSphere
+        const: 'platform:vsphere'
     default: 'platform:aws'
   OperatingSystem:
     type: string
@@ -223,19 +227,19 @@ resources:
     properties:
       networkType: existing
       constraints:
-        - tag: 'function:public'
+        - tag: '${input.Platform == "platform:vsphere" ? "network:projectrock" : "function:public"}'
         - tag: '${input.Platform}'
   Web_Priv_Net:
     type: Cloud.Network
     properties:
       networkType: existing
       constraints:
-        - tag: 'function:web-priv'
+        - tag: '${input.Platform == "platform:vsphere" ? "network:projectrock" : "function:web-priv"}'
         - tag: '${input.Platform}'
   DB_Priv_Net:
     type: Cloud.Network
     properties:
       networkType: existing
       constraints:
-        - tag: 'function:database'
+        - tag: '${input.Platform == "platform:vsphere" ? "network:projectrock" : "function:database"}'
         - tag: '${input.Platform}'
