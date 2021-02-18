@@ -1,5 +1,5 @@
 name: TheRock WebApp CodeStream
-version: 1.6
+version: 1.7
 formatVersion: 1
 inputs:
   Platform:
@@ -117,6 +117,8 @@ resources:
           - cd /var/www/html
           - rm index.html
           - 'git clone https://github.com/sndrmn/ProjectRock.git .'
+          - rm mongo.php
+          - rm mssql.php
           - service apache2 restart
   Pub_Net:
     type: Cloud.Network
