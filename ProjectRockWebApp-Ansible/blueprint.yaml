@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.96
+version: 2.97
 formatVersion: 1
 inputs:
   Platform:
@@ -174,10 +174,6 @@ resources:
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       Infoblox.IPAM.Network.dnsSuffix: test.cmlab.local
       cloudConfig:
-        repo_update: true
-        repo_upgrade: all
-        package_update: true
-        package_upgrade: all
         users:
           - name: projectrock
             ssh-authorized-keys:
@@ -221,10 +217,10 @@ resources:
         runcmd:
           - cd /var/tmp
           - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/MovieList.json"'
-          - 'apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 4B7C549A058F8B6B'
-          - 'echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb.list'
+          - 'curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -'
+          - 'echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list'
           - apt-get update
-          - apt install mongodb-org -y --allow-unauthenticated
+          - apt install mongodb-org -y
           - systemctl enable mongod
           - systemctl start mongod
           - mongoimport --db RockMovies --collection movies --file MovieList.json
@@ -236,7 +232,7 @@ resources:
           - cd /etc
           - rm mongod.conf
           - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/mongod.conf"'
-          - systemctl start mongod
+          - systemctl start mongod  
   Pub_Net:
     type: Cloud.Network
     properties:
