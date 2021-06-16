@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 2.7
+version: 2.8
 formatVersion: 1
 inputs:
   Platform:
@@ -129,9 +129,9 @@ resources:
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       cloudConfig:
         runcmd:
-          - 'hostnamectl set-hostname ${input.Web1Name}'
+          - 'hostnamectl set-hostname ${input.Web1Name} --static'
           - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
-          - sh install_salt.sh -A projectrock-saltmaster.vmware.education
+          - sh install_salt.sh -i ${input.Web1Name} -A projectrock-saltmaster.vmware.education
       count: '${input.OperatingSystem == "linux" ? 1 : 0}'
   Win_Web_Server1:
     type: Cloud.Machine
@@ -162,9 +162,9 @@ resources:
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       cloudConfig:
         runcmd:
-          - 'hostnamectl set-hostname ${input.Web2Name}'
+          - 'hostnamectl set-hostname ${input.Web2Name} --static'
           - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
-          - sh install_salt.sh -A projectrock-saltmaster.vmware.education
+          - sh install_salt.sh -i ${input.Web2Name} -A projectrock-saltmaster.vmware.education
       count: '${input.OperatingSystem == "linux" ? 1 : 0}'
   Win_Web_Server2:
     type: Cloud.Machine
@@ -199,9 +199,9 @@ resources:
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       cloudConfig:
         runcmd:
-          - 'hostnamectl set-hostname ${input.DBName}'
+          - 'hostnamectl set-hostname ${input.DBName} --static'
           - 'curl -L https://bootstrap.saltstack.com -o install_salt.sh'
-          - sh install_salt.sh -A projectrock-saltmaster.vmware.education
+          - sh install_salt.sh -i ${input.DBName} -A projectrock-saltmaster.vmware.education
       count: '${input.OperatingSystem == "linux" ? 1 : 0}'
   MSSQL_DB:
     type: Cloud.Machine
