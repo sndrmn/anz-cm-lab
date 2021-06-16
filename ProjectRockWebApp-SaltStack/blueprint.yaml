@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 2.6
+version: 2.7
 formatVersion: 1
 inputs:
   Platform:
@@ -120,7 +120,7 @@ resources:
   Web_Server1:
     type: Cloud.Machine
     properties:
-      image: ubuntu1604
+      image: ubuntu2004
       flavor: '${input.WebCompute}'
       constraints: null
       networks:
@@ -153,7 +153,7 @@ resources:
   Web_Server2:
     type: Cloud.Machine
     properties:
-      image: ubuntu1604
+      image: ubuntu2004
       flavor: '${input.WebCompute}'
       constraints: null
       networks:
@@ -189,7 +189,7 @@ resources:
       mongodb: 'true'
       mssql: 'false'
       DNS: '${env.deploymentName}'
-      image: ubuntu1604
+      image: ubuntu2004
       flavor: '${input.DBCompute}'
       constraints:
         - tag: 'region:sydney'
