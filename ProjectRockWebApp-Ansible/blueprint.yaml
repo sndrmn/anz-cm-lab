@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.98
+version: 2.99
 formatVersion: 1
 inputs:
   Platform:
@@ -72,6 +72,21 @@ resources:
       hostVariables: |
         website: '${to_lower(env.deploymentName)}'
       inventoryFile: /home/ubuntu/hosts
+  Ansible-vSphere-Mongo:
+    type: Cloud.Ansible
+    properties:
+      host: '${resource.Mongo_DB.*}'
+      osType: linux
+      account: CMLab-Ansible
+      username: projectrock
+      privateKeyFile: /home/ubuntu/projectrock/projectrock-ansible.pem
+      groups:
+        - projectrock_mongodb
+      playbooks:
+        provision:
+          - /home/ubuntu/projectrock/projectrock-mongo.yml
+      hostVariables: |
+        mongopass: '${input.MongoAdminPassword}'
   Ansible-Azure:
     type: Cloud.Ansible
     properties:
@@ -89,6 +104,21 @@ resources:
       hostVariables: |
         website: '${to_lower(env.deploymentName)}'
       inventoryFile: /home/ubuntu/hosts
+  Ansible-Azure-Mongo:
+    type: Cloud.Ansible
+    properties:
+      host: '${resource.Mongo_DB.*}'
+      osType: linux
+      account: Azure-Ansible
+      username: projectrock
+      privateKeyFile: /home/ubuntu/projectrock/projectrock-ansible.pem
+      groups:
+        - projectrock_mongodb
+      playbooks:
+        provision:
+          - /home/ubuntu/projectrock/projectrock-mongo.yml
+      hostVariables: |
+        mongopass: '${input.MongoAdminPassword}'
   Ansible-AWS:
     type: Cloud.Ansible
     properties:
@@ -106,6 +136,21 @@ resources:
       hostVariables: |
         website: '${to_lower(env.deploymentName)}'
       inventoryFile: /home/socialab/hosts
+  Ansible-AWS-Mongo:
+    type: Cloud.Ansible
+    properties:
+      host: '${resource.Mongo_DB.*}'
+      osType: linux
+      account: SociaLab-Ansible
+      username: projectrock
+      privateKeyFile: /home/socialab/projectrock/projectrock-ansible.pem
+      groups:
+        - projectrock_mongodb
+      playbooks:
+        provision:
+          - /home/socialab/projectrock/projectrock-mongo.yml
+      hostVariables: |
+        mongopass: '${input.MongoAdminPassword}'
   LoadBalancer:
     type: Cloud.LoadBalancer
     properties:
@@ -182,57 +227,6 @@ resources:
               - 'ALL=(ALL) NOPASSWD:ALL'
             groups: sudo
             shell: /bin/bash
-        write_files:
-          - path: /home/projectrock/mongousers.sh
-            content: |
-              #!/bin/bash
-              echo "Adding admin user"
-              mongo admin <<'EOF'
-              use admin
-              var user = {
-              "user" : "superAdmin",
-              "pwd" : '${input.MongoAdminPassword}',
-               roles : [
-                   {
-                        "role" : "userAdminAnyDatabase",
-                        "db" : "admin"
-                   }
-               ]
-              }
-              var user2 = {
-              "user" : "ReadUser",
-              "pwd" : 'password',
-               roles : [
-                  {
-                        "role" : "read",
-                        "db" : "RockMovies"
-                 }
-               ]
-              }
-              db.createUser(user);
-              use RockMovies
-              db.createUser(user2);
-              exit
-              EOF
-        runcmd:
-          - cd /var/tmp
-          - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/MovieList.json"'
-          - 'curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -'
-          - 'echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list'
-          - apt-get update
-          - apt install mongodb-org -y
-          - systemctl enable mongod
-          - systemctl start mongod
-          - mongoimport --db RockMovies --collection movies --file MovieList.json
-          - cd /home/projectrock
-          - chmod +x mongousers.sh
-          - ./mongousers.sh
-          - rm mongousers.sh
-          - systemctl stop mongod
-          - cd /etc
-          - rm mongod.conf
-          - 'wget "https://s3-ap-southeast-2.amazonaws.com/vmware.education/mongod.conf"'
-          - systemctl start mongod  
   Pub_Net:
     type: Cloud.Network
     properties:
