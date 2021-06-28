@@ -1,0 +1,124 @@
+---
+- hosts: projectrock_mongodb
+  become: yes
+  become_method: sudo
+  
+  gather_facts: False
+  pre_tasks:
+    - pause:
+       minutes: 2
+    - raw: sudo apt-get update
+      register: result
+    - raw: sudo apt-get -y install python
+      register: ubuntu_python_result
+
+  tasks:
+    - name: Download MovieList.json
+      get_url:
+        url: https://s3-ap-southeast-2.amazonaws.com/vmware.education/MovieList.json
+        dest: /var/tmp
+
+    - name: Curl Command to add mongokey
+      shell: "curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -"
+
+    - name: Add Repo
+      get_url:
+       url: https://sveenstra.s3.ap-southeast-2.amazonaws.com/repo.sh
+       dest: /var/tmp
+
+    - name: Execute Permission repo.sh
+      file: dest=/var/tmp/repo.sh mode=a+x
+
+    - name: Run Cmd
+      shell: /var/tmp/repo.sh
+      become: true
+      args:
+       executable: /bin/bash
+
+    - name: Update repo & cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+    - name: Install mongo-org
+      apt:
+        name: mongodb-org
+        state: present
+
+    - name: Enable Mongod
+      systemd:
+        name: mongod
+        enabled: yes
+
+    - name: Start Mongod
+      systemd: state=started name=mongod
+
+    - name: Import DB into Mongodb
+      shell: "mongoimport --db RockMovies --collection movies --file /var/tmp/MovieList.json"
+
+    - name: Create mongousers.sh
+      copy:
+        dest: /var/tmp/mongousers.sh
+        content: |
+          echo "Adding admin user"
+          mongo admin <<'EOF'
+          use admin
+          var user = {
+           "user" : "superAdmin",
+           "pwd" : "default",
+            roles : [
+                {
+                  "role" : "userAdminAnyDatabase",
+                  "db" : "admin"
+                }
+            ]
+           }
+           var user2 = {
+           "user" : "ReadUser",
+           "pwd" : 'password',
+            roles : [
+                {
+                  "role" : "read",
+                  "db" : "RockMovies"
+                }
+            ]
+           }
+           db.createUser(user);
+           use RockMovies
+           db.createUser(user2);
+           exit
+           EOF
+
+    - name: Replace Default Password
+      replace:
+        path: /var/tmp/mongousers.sh
+        regexp: 'default'
+        replace: "{{ mongopass }}"
+
+    - name: Make mongousers.sh executable
+      file: dest=/var/tmp/mongousers.sh mode=a+x
+
+    - name: Run Mongousers.sh
+      shell: /var/tmp/mongousers.sh
+      become: true
+      args:
+        executable: /bin/bash
+
+    - name: Delete mongousers.sh
+      file:
+        path: /var/tmp/mongousers.sh
+        state: absent
+
+    - name: Stop mongod
+      systemd: state=stopped name=mongod
+
+    - name: Delete mongod.conf
+      file:
+        path: /etc/mongod.conf
+        state: absent
+
+    - name: Download new mongod.conf 
+      get_url:
+        url: https://s3-ap-southeast-2.amazonaws.com/vmware.education/mongod.conf
+        dest: /etc
+
+    - name: Start mongod
+      systemd: state=started name=mongod

@@ -2,7 +2,7 @@
 - hosts: projectrock_web
   become: yes
   become_method: sudo
-
+  
   gather_facts: False
   pre_tasks:
     - pause:
@@ -17,7 +17,7 @@
       get_url:
         url: https://sveenstra.s3-ap-southeast-2.amazonaws.com/rename.sh
         dest: /home/projectrock/rename.sh
-
+   
     - name: Change Shell Script Permissions
       file: dest=/home/projectrock/rename.sh mode=a+x
 
@@ -27,37 +27,37 @@
       args:
        executable: /bin/bash
 
-    - name: Install apache2
+    - name: Install apache2  
       apt:
-	      name: apache2
+        name: apache2
         state: present
-
-    - name: Install php
+    
+    - name: Install php 
       apt:
         name: php
         state: present
-
+    
     - name: Install Apachemod for php
       apt:
         name: libapache2-mod-php
         state: present
-
+    
     - name: Install mongo for php
       apt:
         name: php-mongodb
         state: present
-
+    
     - name: Remove index.html so /var/www/html is empty
       file:
         path: /var/www/html/index.html
         state: absent
-
+    
     - name: Git Clone
       git:
         repo: https://github.com/sndrmn/ProjectRock.git
         dest: /var/www/html
         clone: yes
-
+    
     - name: Download ssl.sh
       get_url:
         url: https://s3-ap-southeast-2.amazonaws.com/vmware.education/ssl.sh
@@ -66,7 +66,7 @@
 
     - name: Change Shell Script Permissions
       file: dest=/home/projectrock/ssl.sh mode=a+x
-
+    
     - name: Run a Shell Script
       shell: /home/projectrock/ssl.sh
       become: true
@@ -84,12 +84,12 @@
           path: /etc/apache2/sites-available/000-default.conf
           regexp: 'projectrock.vmware.education'
           replace: "{{ website }}.vmware.education"
-
+    
     - name: Update /etc/apache2/envvars
       lineinfile:
          path: /etc/apache2/envvars
          line: export MONGOUSER=ReadUser
-
+    
     - name: Update/etc/apache2/envvars
       lineinfile:
          path: /etc/apache2/envvars
