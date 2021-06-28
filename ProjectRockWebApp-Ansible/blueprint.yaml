@@ -1,5 +1,5 @@
 name: TheRock WebApp w/Ansible
-version: 2.99
+version: 3.00
 formatVersion: 1
 inputs:
   Platform:
@@ -78,6 +78,7 @@ resources:
       host: '${resource.Mongo_DB.*}'
       osType: linux
       account: CMLab-Ansible
+      count: '${input.Platform == "platform:vsphere" ? 1 : 0}'
       username: projectrock
       privateKeyFile: /home/ubuntu/projectrock/projectrock-ansible.pem
       groups:
@@ -110,6 +111,7 @@ resources:
       host: '${resource.Mongo_DB.*}'
       osType: linux
       account: Azure-Ansible
+      count: '${input.Platform == "platform:azure" ? 1 : 0}'
       username: projectrock
       privateKeyFile: /home/ubuntu/projectrock/projectrock-ansible.pem
       groups:
@@ -142,6 +144,7 @@ resources:
       host: '${resource.Mongo_DB.*}'
       osType: linux
       account: SociaLab-Ansible
+      count: '${input.Platform == "platform:aws" ? 1 : 0}'
       username: projectrock
       privateKeyFile: /home/socialab/projectrock/projectrock-ansible.pem
       groups:
