@@ -1,5 +1,5 @@
 name: ProjectRock - MSSQL PaaS
-version: 2.2
+version: 2.3
 description: MSSQL PaaS Request
 formatVersion: 1
 inputs:
@@ -33,7 +33,7 @@ resources:
     properties:
       os: UBUNTU
       servertuype: WEB
-      image: ubuntu1604
+      image: ubuntu2004
       flavor: small
       DNS: '${env.deploymentName}'
       networks:
