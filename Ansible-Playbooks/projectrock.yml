@@ -13,7 +13,7 @@
       register: ubuntu_python_result
 
   tasks:
-    - name: Download Shell Script
+    - name: Download Shell Script-dude
       get_url:
         url: https://sveenstra.s3-ap-southeast-2.amazonaws.com/rename.sh
         dest: /home/projectrock/rename.sh
