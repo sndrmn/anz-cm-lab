@@ -1,5 +1,5 @@
 name: TheRock WebApp w/SaltStack
-version: 2.8
+version: 2.9
 formatVersion: 1
 inputs:
   Platform:
@@ -145,8 +145,8 @@ resources:
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       cloudConfig: |
         <powershell>
-        Invoke-WebRequest -Uri "https://repo.saltstack.com/windows/Salt-Minion-3002.2-Py3-AMD64.msi" -OutFile "c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi" 
-        msiexec /i c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.Web1Name}
+        Invoke-WebRequest -Uri "https://repo.saltproject.io/windows/Salt-Minion-Latest-Py3-x86.msi" -OutFile "c:\windows\temp\Salt-Minion-Latest-Py3-x86.msi" 
+        msiexec /i c:\windows\temp\Salt-Minion-Latest-Py3-x86.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.Web1Name}
         Rename-Computer -NewName "${input.Web1Name}"
         </powershell>
       count: '${input.OperatingSystem == "windows" ? 1 : 0}'
@@ -178,8 +178,8 @@ resources:
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       cloudConfig: |
         <powershell>
-        Invoke-WebRequest -Uri "https://repo.saltstack.com/windows/Salt-Minion-3002.2-Py3-AMD64.msi" -OutFile "c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi" 
-        msiexec /i c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.Web2Name}
+        Invoke-WebRequest -Uri "https://repo.saltproject.io/windows/Salt-Minion-Latest-Py3-x86.msi" -OutFile "c:\windows\temp\Salt-Minion-Latest-Py3-x86.msi" 
+        msiexec /i c:\windows\temp\Salt-Minion-Latest-Py3-x86.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.Web2Name}
         Rename-Computer -NewName "${input.Web2Name}"
         </powershell>
       count: '${input.OperatingSystem == "windows" ? 1 : 0}'
@@ -218,8 +218,8 @@ resources:
           assignment: '${input.Platform == "platform:vsphere" ? "static" : "dynamic"}'
       cloudConfig: |
         <powershell>
-        Invoke-WebRequest -Uri "https://repo.saltstack.com/windows/Salt-Minion-3002.2-Py3-AMD64.msi" -OutFile "c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi" 
-        msiexec /i c:\windows\temp\Salt-Minion-3002.2-Py3-AMD64.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.DBName}
+        Invoke-WebRequest -Uri "https://repo.saltproject.io/windows/Salt-Minion-Latest-Py3-x86.msi" -OutFile "c:\windows\temp\Salt-Minion-Latest-Py3-x86.msi" 
+        msiexec /i c:\windows\temp\Salt-Minion-Latest-Py3-x86.msi /quiet /norestart MASTER=projectrock-saltmaster.vmware.education MINION_ID=${input.DBName}
         </powershell>
       count: '${input.OperatingSystem == "windows" ? 1 : 0}'
   Pub_Net:
